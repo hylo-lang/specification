@@ -1,4 +1,4 @@
-# 1. Introduction
+# Introduction
 
 Val is a research language based on the principles of mutable value semantics (MVS) (Racordon et al. 2022) for safety and efficiency. It is designed to help developers write and maintain correct programs using powerful abstractions without loss of efficiency.
 
@@ -27,17 +27,17 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ## 2.3. Comments
 
-1. The characters `//` start a single-line comment, which terminates immediately before the next new-line delimiter.
+1. The character sequence `//` start a single-line comment, which terminates immediately before the next new-line delimiter.
 
-2. The characters `/*` denote a comment opening delimiter and the characters `*/` denote a comment closing delimiter. An opening comment delimiter starts a multiline comment, which terminates after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest.
+2. The character sequences `/*` and `*/` denote multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest, and need not contain any new-line characters.
 
-3. The characters `//` have no special meaning in a multiline comment. The characters `/*` and `*/` have no special meaning in a single-line comment. The characters `//` and `/*` have no special meaning in a string literal. Conversely, string opening delimiters have no special meaning in a comment.
+3. The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.
 
 ## 2.4. Tokens
 
 1. A token is a terminal symbol of the syntactic grammar. It falls into one of five categories: scalar literals, keywords, raw identifiers, raw operators, and punctuators.
 
-2. A token is associated with a three-valued flag specifying whether it was followed by a raw character, an inline space (including an inline space substituted for a comment), or a new-line delimiter in the sequence of Unicode characters.
+2. A token is associated with a three-valued flag specifying whether it was followed by a raw character, an inline space (including an inline space substituted for a comment), or a new-line delimiter in the source file.
 
 3. (Example)
 
