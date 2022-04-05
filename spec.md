@@ -6,15 +6,15 @@ Val is strongly related to the [Swift programming language](https://www.swift.or
 
 On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.31.5002&rep=rep1&type=pdf), ownership types [(Clarke et al. 2013)](https://doi.org/10.1007/978-3-642-36946-9_3), and capability-based type systems [(Smith et al. 2000)](https://doi.org/10.1007/3-540-46425-5_24), while striving to hide the complexity inherent to these approaches. It does so by excluding first-class references from the user model and using continuations to mitigate the loss of expressiveness.
 
-# 2. Lexical conventions
+# Lexical conventions
 
-## 2.1. Program text
+## Program text
 
-1. A Val program is written in text format. The text of a program is written using the [Unicode](https://home.unicode.org) character set and kept in units called source files. A source file is a sequence of Unicode characters represented with the UTF-8 encoding.
+1. A Val program is written in text format. The text of a program is written using the [Unicode](https://home.unicode.org) character set and kept in units called source files. A source file is a sequence of Unicode Extended Grapheme clusters.
 
 2. This document refers to individual Unicode characters with the notation `U+n` where `n` is a hexadecimal value representing a Unicode code point, and refers to the Unicode general categories to identify groups of Unicode characters.
 
-## 2.2. Lexical translations
+## Lexical translations
     
 1. A sequence of Unicode characters is translated into a sequence of tokens. The following rules apply during translation:
 
@@ -25,7 +25,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. New-line delimiters are recognized as `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A`.
 
 
-## 2.3. Comments
+## Comments
 
 1. The character sequence `//` start a single-line comment, which terminates immediately before the next new-line delimiter.
 
@@ -33,21 +33,21 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.
 
-## 2.4. Tokens
+## Tokens
 
-1. A token is a terminal symbol of the syntactic grammar. It falls into one of five categories: scalar literals, keywords, raw identifiers, raw operators, and punctuators.
+1. A token is a terminal symbol of the syntactic grammar. It falls into one of five categories: scalar literals, keywords, identifiers, raw operators, and punctuators.
 
 2. A token is associated with a three-valued flag specifying whether it was followed by a raw character, an inline space (including an inline space substituted for a comment), or a new-line delimiter in the source file.
 
 3. (Example)
 
-    The input "a << b" is translated to a sequence of 4 tokens: __raw-identifier__, __raw-operator__, __raw-operator__, __raw-identifier__. The first and third tokens are known to be followed by an inline space.
+    The input "a << b" is translated to a sequence of 4 tokens: __identifier__, __raw-operator__, __raw-operator__, __identifier__. The first and third tokens are known to be followed by an inline space.
 
 4. Unless otherwise specified, the token recognized at a given lexical position is the one having the longest possible sequence of characters.
 
-### 2.4.1. Scalar literals
+### Scalar literals
 
-#### 2.4.1.1. Boolean literals
+#### Boolean literals
 
 1. The Boolean literals are `true` and `false`:
 
@@ -57,7 +57,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       false
     ```
 
-#### 2.4.1.2. Integer literals
+#### Integer literals
 
 1. Integer literals have the form:
 
@@ -114,7 +114,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. The default inferred type of an integer literal is the Val standard library `Int`, which represents a 64-bit signed integer. If the interpreted value of an integer literal is not in the range of representable values for its type, the program is ill-formed.
 
-#### 2.4.1.3. Floating-point literals
+#### Floating-point literals
 
 1. Floating-point literals have the form:
 
@@ -153,7 +153,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the scaled value if representable, else the larger or smaller representable value nearest the scaled value, chosen in an implementation-defined manner.
 
-#### 2.4.1.4. Character literals
+#### Character literals
 
 1. Character literals have the form:
 
@@ -175,9 +175,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     c-char ::= (any unicode character except ')
     ```
 
-2. The __hexadecimal-digit__  of a __unicode-escape__ represents a Unicode code point.
+2. The __hexadecimal-digit__  of a __unicode-escape__ represents a Unicode scalar value.
 
-#### 2.4.1.5. String literals
+#### String literals
 
 1. String literals have the form:
 
@@ -225,7 +225,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     print(s) // "  Hello,\n  World!"
     ```
 
-### 2.4.2. Keyowrds
+### Keyowrds
 
 1. A keywords are reserved identifiers. They have the form:
 
@@ -233,23 +233,23 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     keyword ::= (one of)
       Any Never as as! _as!! async await break catch conforance continue deinit else extension
       false for fun if import in infix init let match namespace nil postfix prefix private public
-      return sink static true try type var where while yield
+      return sink static true try type typealias var where while yield
     ```
 
-### 2.4.3. Raw identifiers
+### Identifiers
 
-1. Raw identifiers are case-sensitive sequences of letters and digits. They have the form:
+1. Identifiers are case-sensitive sequences of letters and digits. They have the form:
 
     ```ebnf
-    raw-identifier ::=
-      raw-identifier-head
-      raw-identifier raw-identifier-tail
+    identifier ::=
+      identifier-head
+      identifier identifier-tail
       backquoted-identifier
       contextual-keyword
 
-    raw-identifier-head ::= (_ and any character in categories Lu, Ll, Lt, Lm, Lo, Nl)
+    identifier-head ::= (_ and any character in categories Lu, Ll, Lt, Lm, Lo, Nl)
 
-    raw-identifier-tail ::= (any character in categories Lu, Ll, Lt, Lm, Lo, Mn, Mc, Nl, Nd, Pc)
+    identifier-tail ::= (any character in categories Lu, Ll, Lt, Lm, Lo, Mn, Mc, Nl, Nd, Pc)
 
     backquoted-identifier ::=
       backquoted-identifier-head bq-char `
@@ -258,12 +258,12 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     bq-char ::= (any character except `, U+A, and U+D)
 
     contextual-keyword ::= (one of)
-      mutating some
+      mutating size some
     ```
 
 2. Contextual keywords are identifiers that have a special meaning when appearing in a certain context. When referred to in the grammar, these identifiers are used explicitly rather than using the identifier grammar production. Unless otherwise specified, any ambiguity as to whether a given identifier has a special meaning is resolved to interpret the token as a regular identifier.
 
-### 2.4.4. Raw operators
+### Raw operators
 
 1. Raw operators have the form:
 
@@ -273,7 +273,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     [Note: The Unicode category Sm includes +, =, <, >, |, and ~.]
 
-### 2.4.5. Punctuators
+### Punctuators
 
 1. Punctuators have the form:
 
@@ -282,9 +282,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       . , ; ( ) [ ] { } : ::
     ```
 
-# 3. General concepts
+# General concepts
 
-## 3.1. Preamble
+## Preamble
 
 1. An *entity* is an object, projection, function, subscript, trait, type, namespace, or module.
 
@@ -296,13 +296,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 5. A *binding* is a name that denotes an object or a projection. The value of a binding is the denoted object or the value of the denoted projection. The value of a binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has been consumed. A mutable binding can be *resurrected* by consuming an object; an immutable binding cannot.
 
-## 3.2. Scopes and declaration spaces
+## Scopes and declaration spaces
 
 1. A *lexical scope* is a region of the program represented by a syntactic element.
 
 2. The lexical scope of a module or namespace declaration is called a *global scope*. The lexical scope of a type, extension, trait, or conformance declaration is called a *type scope*. Unless specified otherwise, the lexical scope of any other syntactic element is called a *local scope*.
 
-3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text delimited by `l1` includes that delimited by `l2`.
+3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text delimited by `l1` includes that delimited by `l2`. The innermost lexical scope that contains a lexical scope is called its *parent*.
 
 4. A lexical scope `l1` is a *sibling* of a lexical scope `l2` if `l1` is the lexical scope of a trait, nominal product type, or type alias declaration `d` and `l2` is the lexical scope of an extension or conformance declaration for the entity declared by `d`, or if `l2` is a sibling of `l1`.
 
@@ -321,7 +321,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     The declarations space of the type declaration includes `foo` and `bar`.
 
-7.  A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. The same name may not be introduced more than once in a declaration space.
+7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. The same name may not be introduced more than once in a declaration space.
 
     ```ebnf
     type A {
@@ -332,7 +332,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-## 3.3. Name lookup
+## Name lookup
 
 1. The procedure that identifies the entity denoted by a name is called *name lookup*. The rules of name lookup apply uniformly to all names.
 
@@ -340,7 +340,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. Access rules are considered only once name lookup and overload resolution have succeeded.
 
-### 3.3.1. Unqualified name lookup
+### Unqualified name lookup
 
 1. Unqualified name lookup `ulookup(n, s)` for a name `n` from a lexical scope `s` is described as follows:
 
@@ -358,7 +358,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
         - if `s` is the lexical scope of the Val standard library, `ulookup(n, s) = {}`.
 
-### 3.3.2. Qualified name lookup
+### Qualified name lookup
 
 1. *Qualified stem name lookup* `qslookup(n, s)` for a name `n` and a lexical scope `s` searches for the entity or entities denoted by a name `m` whose stem identifiers are equal to that of `n` in the context of the entity associated with `s`.
 
@@ -389,11 +389,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     Qualified name lookup for `foo(a:)` in the lexical scope `s` of the declaration of `A` starts with a qualified stem name lookup for `foo(a:)` in `s`. That search returns a set with three entities named `foo(a:)`, `foo(b:).let`, and `foo(b:).inout`. Since `foo(a:)` is a method name, the two last entities are discarded and the seach concludes with a singleton.
 
-#### 3.3.2.1. In a global or local scope
+#### In a global or local scope
 
 1. Qualified stem name lookup `qslookup(n, s)` for a name `n` in a local or global scope `s` is the set containing the entities such that there exists a name in the declaration space of `s` whose stem identifier is equal to the stem identifier of `n`.
 
-#### 3.3.2.2. In a type scope
+#### In a type scope
 
 1. The names introduced in the declaration space of the declaration of a trait, nominal product type, or type alias are members of the declared entity.
 
@@ -409,7 +409,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     - If `s` is the lexical scope of an extension or conformance declaration, `qslookup(n, s) = qslookup(n, s')` where `s'` is the lexical scope of the declaration of the extended type.
 
-## 3.4. Program and linkage
+## Program and linkage
 
 1. A program consists of one or more module declarations linked together.
 
@@ -421,7 +421,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     3. When a name has *internal linkage*, the entity it denotes can be referred to by names from any scope contained in the scope that contains its declaration.
 
-## 3.5. Memory model
+## Memory model
 
 1. The fundamental storage unit in the Val memory model is the *byte*. A byte is a contiguous sequence of 8 bits. The memory available to a Val program consists of one or more sequences of contiguous bytes. Every byte has a unique address.
 
@@ -435,7 +435,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
   
 6. A memory location bound to `A` may be used as storage for an object of type `A`. A bound memory location shall not be rebound to another type or deallocated if it is used as storage for an object whose lifetime has not yet ended, or if it is contained in a bound memory location. Otherwise, the behavior is undefined.
 
-### 3.5.1. Memory location lifetime
+### Memory location lifetime
 
 1. The lifetime of a memory location starts when it is allocated and ends when it is deallocated. The lifetime of a memory location falls in one of three categories: *static*, *automatic*, or *dynamic*. The lifetime category is determined by the construct used to allocate the memory location.
 
@@ -451,7 +451,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. When the end of the lifetime a memory location is reached, all names denoting objects stored within that location become invalid. Deallocating a memory location that has already reached the end of its lifetime has undefined behavior.
 
-## 3.6. Objects
+## Objects
 
 1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, call to a `sink` accessor, or it is the value of an escapable binding. [Note: A function is not an object but a lambda is.]
 
@@ -477,7 +477,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 8. Unless an object is a sub-object of zero size, the address of that object is the address of the memory location it occupies. Two objects with overlapping lifetimes may have the same address if one is nested within the other, or if at least one is a sub-object that has zero size; otherwise, they have distinct addresses and occupy disjoint memory locations.
 
-### 3.6.1. Object lifetime
+### Object lifetime
 
 1. The lifetime of an object of type `A` begins when:
    
@@ -505,7 +505,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 6. If, after the lifetime of an object has ended and before the memory location which the object occupied is reused or deallocated, a new object is stored at the memory location which the original object occupied, the name of the original object automatically denotes the new object and, once the lifetime of the new object has started, can be used to manipulate the new object.
 
-### 3.6.2. Object alignment
+### Object alignment
 
 1. Object types have alignment requirements which place restrictions on the addresses of the memory locations which an object of that type may occupy. An alignment is an plateform-specific integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type.
 
@@ -521,7 +521,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     
     3. When an alignment is larger than another it represents a stricter alignment.
 
-### 3.6.3. Sinkability
+### Sinkability
 
 1. An object is said to be *consumed* if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable, escapable, or member binding.
 
@@ -540,7 +540,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-### 3.6.4. Escapability
+### Escapability
 
 1. A sinkable object evaluated by a non-consuming expression is escapable at a given program point if it is not projected by any other object at that program point.
 
@@ -561,7 +561,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. An escapable object may be consumed.
 
-## 3.7. Projections
+## Projections
 
 1. A projection exposes an object.
 
@@ -639,9 +639,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-# 4. Types
+# Types
 
-## 4.1. General
+## General
 
 1. The Val language is statically typed. Every entity has a type that is known at compile time. The type of an entity is immutable.
 
@@ -651,7 +651,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. The *object representation* of an object is the set of bytes that it occupies in storage. The *value representation* of an object of type `A` is the set of bits that participate in representing a value of type `A`. Bits in the object representation that are not part of the value representation are called *padding bits*.
 
-## 4.2. Built-in types
+## Built-in types
 
 1. A built-in type is an instantiable nominal type representing a value on the execution machine. A built-in type may be referred to only in Val standard library and shall not conform to any trait.
 
@@ -663,7 +663,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 5. There is a unique built-in pointer type `Builtin.Pointer` that denotes an untyped pointer to a memory location. The object and value representation of `Builtin.Pointer` are the same as that of `Builtin.Word`.
 
-## 4.3. Subtyping relation
+## Subtyping relation
 
 1. The types form a lattice, partially ordered by a subtyping relation `<:`, for which the least upper bound is `Any` and the greatest lower bound is `Never`.
 
@@ -703,28 +703,26 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       
       - `(any T & U where ::T.Element == Int) <: (any T where ::T.Element == Int)`
 
-## 4.4. Generic types
+## Generic types
 
-# 5. Declarations
+# Declarations
 
-## 5.1. Modifiers
+## Modifiers
 
-### 5.1.1. Access modifiers
+### Access modifiers
 
-1. A name `n` is said to be *accessible* in a scope `s` if the declaration that introduces `n` exposes it in `s`. An access modifier specifies how a declaration exposes the names it introduces. Access modifiers have the form:
+1. A name is *exposed* to a lexical scope if it can be referred to from that scope. When a name is exposed in a lexical scope, it is exposed in all scopes contained in that scope. An access modifier specifies how a declaration exposes the names it introduces. Access modifiers have the form:
 
     ```ebnf
     access-modifier ::=
       public
     ```
 
-2. A private access modifier may only appear in a subscript implementation.
+2. A declaration is *private* if it does not have any access modifier. A private declaration *exposes* the names that it introduces to the innermost scope that contains it. The static and non-static members introduced in the lexical scope of a type declaration are additionally exposed to the lexical scopes of the conformance declarations of the declared type.
 
-3. A declaration is *private* if it does not have any access modifier. A private declaration exposes the names that it introduces to the innermost scope that contains it, and in the lexical scopes contained in that scope. A declaration denoting a static or non-static member additionally exposes the names it introduces to the lexical scopes of the conformance declarations of the declared type, and in the scopes contained in those scopes.
+3. A declaration is *public* if it has a `public` access modifier. A public declaration exposes the names it introduces the parent scope of the innermost scope that contains it. A public declaration that appears in the lexical scope of a module is *external*.
 
-4. A declaration is *public* if it has a a `public` access modifier. A public declaration exposes the names it introduces the parent scope of the innermost scope that contains it.
-
-5. (Example)
+4. (Example)
 
     ```val
     type A {
@@ -746,19 +744,22 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-### 5.1.2. Member modifiers
+### Member modifiers
 
 1. Member modifiers have the form:
 
     ```ebnf
     member-modifier ::=
       receiver-modifier
-      'static'
+      static-modifier
     
     receiver-modifier ::=
       'sink'
       'inout'
       'out'
+
+    static-modifier ::=
+      'static'
     ```
 
 2. A member modifier may appear at most once in a declaration.
@@ -769,7 +770,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 5. The `out` modifier may only appear in a subscript declaration.
 
-## 5.2. Conformance lists
+## Conformance lists
 
 1. Conformance lists have the form:
 
@@ -778,7 +779,37 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       ':' type-identifier (',' type-identifier)
     ```
 
-## 5.3. Where clauses
+## Generic clauses
+
+1. Generic clauses have the form:
+
+    ```ebnf
+    generic-clause ::=
+      '<' generic-param (',' generic-param)* where-clause? '>'
+    
+    generic-param ::=
+      generic-type-param
+      generic-size-param
+    
+    generic-type-param ::=
+      identifier '...'? trait-annotation?
+
+    trait-annotation ::=
+      ':' trait-composition
+    
+    generic-size-param ::=
+      identifier ':' 'size'
+    ```
+
+2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it as been written in the where clause.
+
+3. (Example)
+
+    The generic clause `<X, Y: Copyable & Equatable>` is sugar for `<X, Y where Y: Copyable & Equatable>`.
+
+4. A generic type parameter whose identifier is directly suffixed by an ellipsis is said to be *variadic*. Within the generic environment in which it is introduced, a variadic type parameter denotes a list of skolems whose length has been existentially quantified. A generic clause can define at most one variadic type parameter, which must appear last.
+
+## Where clauses
 
 1. Where clauses have the form:
 
@@ -788,24 +819,29 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     where-clause-constraint ::=
       equality-constraint
-      conformance-contraint
-      value-constraint
+      conformance-constraint
+      size-constraint-expr
 
     equality-constraint ::=
       type-name '==' type-expr
 
-    conformance-contraint ::=
-      type-name ':' type-name
-
-    value-contraint ::=
-      decl-ref ':' type-name
+    conformance-constraint ::=
+      type-name ':' trait-composition
     ```
 
-## 5.4. Trait declarations
+2. A where clause specifies constraints on the generic parameters introduced by a generic signature, or the associated type requirements introduced by a trait declaration.
 
-### 5.4.1. General
+    1. An equality constraint specifies that the types denoted by either side of `==` must be equivalent.
+    
+    2. A conformance constraint specifies that the type denoted by the left hand side of `:` be conforming to the traits specified in __trait-composition__.
 
-1. A trait is a collection of requirements on a type. [Note: A trait is not a type but it may form a type if it is part of a trait composition.]
+    3. A size constraint is an expression denoting a predicate over one or more size parameters. It must be an expression of type `Bool` and shall only refer to size parameters or names introduced in global scopes.
+
+## Trait declarations
+
+### General
+
+1. A trait is a collection of requirements on a type. [Note: A trait is not a type but it may form a type if it is part of an existential type.]
 
 2. Trait declarations have the form:
 
@@ -814,34 +850,46 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       trait-head trait-body
 
     trait-head ::=
-      access-modifier? 'trait' raw-identifier conformance-list
+      access-modifier? 'trait' identifier conformance-list
 
     trait-refinement-list ::=
       ':' type-identifier (',' type-identifier)
 
     trait-body ::=
-      '{' trait-requirement-list? '}'
+      '{' trait-requirement-decl-list? '}'
 
-    trait-requirement-list ::=
-      trait-requirement (';'* trait-requirement)+ ';'*
+    trait-requirement-decl-list ::=
+      trait-requirement-decl (';'* trait-requirement-decl)+ ';'*
 
-    trait-requirement ::=
+    trait-requirement-decl ::=
       associated-type-decl
       function-decl
       subscript-decl
     ```
 
-3. A trait declaration may only appear at global scope. It introduces __raw-identifier__ as a name denoting the declared trait.
+3. (Example)
 
-4. The associated type, function, and subscript declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
+    ```val
+    trait Shape {
+      static fun name() -> String
+      fun draw(to: inout Canvas)
+    }
+    ```
 
-### 5.4.2. Associated type requirements
+4. A trait declaration may only appear at global scope. It introduces __identifier__ as a name denoting the declared trait.
+
+5. The associated type, function, and subscript declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
+
+### Associated type requirements
 
 1. An associated type declaration defines an *associated type requirement*. As associated type is a placeholder for a type that relates to the trait and must be specified by conforming types. Associated type declarations have the form:
 
     ```ebnf
     associated-type-decl ::=
-      'type' raw-identifier associated-type-constraints? associated-type-default?
+      associated-type-head associated-type-constraints? associated-type-default?
+
+    associated-type-head ::=
+      static-modifier? identifier
 
     associated-type-constraints ::=
       conformance-list
@@ -864,13 +912,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     The trait `Generator` declares an associated type requirement `Element`, constrained to types that conform to another trait `Copyable`. `Element` appears as in the return type of the method requirement `next`.
 
-### 5.4.3. Method requirements
+### Method requirements
 
-1. A function declaration that appears in the body of a trait declaration is a *method requirement decalration* that defines a one or more *method requirements*. A method requirement is the specification of a method implementation that must be defined in conforming types.
+1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines a one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
 
 2. When a method requirement declaration has a __fun-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines denotes a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
 
-3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __fun-bundle-body__ of a funcion requirement declaration, or via a default requirement implementation declared in a trait extension.
+3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __fun-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
 
 4. (Example)
 
@@ -898,21 +946,21 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-    The method requirement `Counter.current` has two default implements: one is defined in the declaration of `Counter` and the other in the conditional trait extension. The method requirement `Counter.foo.let` has one default implementation, defined in the unconditional trait extension. The method requirement `Counter.foo.inout` has one default implementation, defined in the conditional trait extension.
+    The method requirement `Counter.current` has two default implementations: one is defined in the declaration of `Counter` and the other in the conditional trait extension. The method requirement `Counter.foo.let` has one default implementation, defined in the unconditional trait extension. The method requirement `Counter.foo.inout` has one default implementation, defined in the conditional trait extension.
 
-### 5.4.4. Subscript requirements
+### Subscript requirements
 
-1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement decalration* that defines a one or more *subscrièt requirements*. A subscrièt requirement is the specification of a subscrièt implementation that must be defined in conforming types.
+1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement declaration* that defines a one or more *subscript requirements*. A subscript requirement is the specification of a subscript that must be implemented in conforming types.
 
 2. A subscript requirement declaration must have a __subscript-bundle-body__. Each subscript implementation in that body denotes a subscript requirement.
 
 3. A subscript requirement may have one or several default implementations. A default implementation may be defined as the body of a subscript implementation in the __subscript-bundle-body__ of a subscript requirement requirement, or via a default requirement implementation declared in a trait extension.
 
-### 5.4.5. Trait refinement
+### Trait refinement
 
 1. A trait `T1` is said to *refine* another trait `T2` if it declares conformance to `T2` and its set of requirements includes all requirements of `T2`. Conformance of the trait `T1` to `T2` shall be declared in the conformance list of the declaration of `T1`.
 
-2. Refinement introduces an ordering between the two traits. A trait `T1` is *finer* than a trait `T2` if `T1` refines `T2` or if there exists a trait `T3` such that `T1` refines `T3` and `T3` is finer than `T2`. Trait refinment shall not introduce cycles. If `T1` is finer than `T2`, `T2` is said to be *coarser* than `T1`.
+2. Refinement introduces an ordering between the two traits. A trait `T1` is *finer* than a trait `T2` if `T1` refines `T2` or if there exists a trait `T3` such that `T1` refines `T3` and `T3` is finer than `T2`. Trait refinement shall not introduce cycles. If `T1` is finer than `T2`, `T2` is said to be *coarser* than `T1`.
 
 3. (Example)
 
@@ -922,9 +970,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     trait C: B {}
     ```
 
-### 5.4.6. Trait conformance
+### Trait conformance
 
-1. A type `A` is said to *conform* a trait `T` if it declares conformance to `T` and satisfies all the requirements of `T`. Conformance of the type `A` to `T` shall be declared in the conformance list of the declaration of `A` or in the conformance list of a conformance declaration of `A`.
+1. A type `A` *conforms* a trait `T1` in a lexical scope if a conformance of `A` to `T1` is exposed to that scope and if `T1` and satisfies all the requirements of `T1`, or if `A` conforms to a trait `T2` such that `T2` refines `T1`.
 
 2. (Example)
 
@@ -946,9 +994,137 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-## 5.5. Binding declarations
+3. A *source* of conformance denotes a declaration defining the conformance. A type or conformance declaration is a source of conformance for all the traits that appear in its inheritance list. A source of conformance is conditional if it is a conformance declaration with a where clause. A type may have at most one source of conformance to a specific trait. A type that conforms to a trait `T1` shall not have a source of conformance to a trait `T2` if `T2` refines `T1` and the source of conformance to `T1` is conditional.
 
-### 5.5.1. General
+4. The conformance of a type `A` to `T` is *exposed* to a lexical scope `l` if and only if `A` is exposed to `l` and the source of the conformance is:
+
+    1. the declaration of `A`; or
+    
+    2. a conformance declaration declared in `l` or a lexical scope that contains `l`; or
+    
+    3. an external conformance declaration imported from another module.
+
+5. The conformance of a type `A` to a trait `T` shall not be exposed outside of the lexical scope of a module `m` unless at least `A` or `T` is declared in `m`.
+ 
+6. (Example)
+
+    ```val
+    import M
+    
+    public type A {}
+    conformance A: M.T    // OK: conformance is private
+    
+    type B: M.T {}        // OK: 'B' is not exposed outside of the module
+
+    public type C: M.T {} // error: cannot expose conformance to imported trait 'M.T'
+    ```
+
+7. A method requirement `r` is satisfied if by a type `A` if `A` has a single method `m` with the same name, type, and kind. `m` may be defined in the type declaration, extension declaration, or a conformance declaration of `A`. If `r` has default implementations, it may be satisfied by `A` if there exists a unique default implementation whose conditions are satisfied by `A`.
+
+## Product type declarations
+
+### General
+
+1. Nominal product type declarations have the form:
+
+    ```ebnf
+    product-type-decl ::=
+      product-type-head product-type-body
+
+    product-type-head ::=
+      access-modifier? identifier generic-clause? conformance-list 
+
+    product-type-body ::=
+      '{' product-type-member-decl-list? '}'
+    
+    product-type-member-decl-list
+      product-type-member-decl (';'* product-type-member-decl)+ ';'*
+
+    product-type-member-decl ::=
+      function-decl
+      subscript-decl
+      product-type-decl
+      type-alias-decl
+    ```
+
+## Type alias declarations
+
+### General
+
+1. Type alias declarations have the form:
+
+    ```ebnf
+    type-alias-decl ::=
+      type-alias-head type-alias-body
+    
+    type-alias-head ::=
+      access-modifier? 'typealias' identifier generic-clause?
+
+    type-alias-body ::=
+      '=' type-expr
+      '=' union-decl
+    
+    union-decl ::=
+      product-type-decl ('|' product-type-decl)*
+    ```
+
+## Extension declarations
+
+### General
+
+1. Extension declarations have the form:
+
+    ```ebnf
+    extension-decl ::=
+      extension-head extension-body
+    
+    extension-head ::=
+      'extension' type-expr where-clause?
+
+    extension-body ::=
+      '{' extension-member-decl-list? '}'
+    
+    extension-member-decl-list
+      extension-member-decl (';'* extension-member-decl)+ ';'*
+
+    extension-member-decl ::=
+      function-decl
+      subscript-decl
+      product-type-decl
+      type-alias-decl
+    ```
+
+2. When a subscript or method `e` is defined in an extension declaration, the constraints of the __where-clause__ of that declarations are called the conditions of `e`.
+
+## Conformance declarations
+
+### General
+
+1. Conformance declarations have the form:
+
+    ```ebnf
+    conformance-decl ::=
+      conformance-head conformance-body
+    
+    conformance-head ::=
+      access-modifier? 'conformance' type-expr ':' trait-composition where-clause?
+
+    conformance-body ::=
+      '{' conformance-member-decl-list? '}'
+    
+    conformance-member-decl-list
+      conformance-member-decl (';'* conformance-member-decl)+ ';'*
+
+    conformance-member-decl ::=
+      function-decl
+      subscript-decl
+      product-type-decl
+      type-alias-decl
+    ```
+
+## Binding declarations
+
+### General
 
 1. Binding declarations have the form:
 
@@ -981,9 +1157,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. A binding declaration defines a new binding for each named pattern in pattern. All new bindings are defined with the same capabilities.
 
-    1. A binding declaration introduced with `let` defines immutable bindings. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
+    1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
-    2. A binding declaration introduced with `var` and `inout` defines mutable bindings. The value of a live mutable binding may be projected mutably or immutably.
+    2. A binding declaration introduced with `var` or `inout` defines a mutable binding. The value of a live mutable binding may be projected mutably or immutably.
 
     3. A binding declaration introduced with `sink` defines an escapable binding. An escapable binding may only be assigned to sinkable objects. The value of an escapable binding may be consumed at a given program point if is escapable at that program point.
 
@@ -1001,7 +1177,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 6. The `sink` capability may only appear in a local binding declaration introduced with `let` or `var`.
 
-### 5.5.2. Initialization
+### Initialization
 
 1. A static member binding declaration, or global binding declaration must contain an initializer. Initialization occurs at the first dynamic use of one of the declared bindings.
 
@@ -1024,7 +1200,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-### 5.5.3. Lifetime
+### Lifetime
 
 1. Binding lifetimes are not bound to lexical scopes.
 
@@ -1041,9 +1217,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```val
     fun main() {
       let count = 1 // lifetime of 'count' begins here
-      count += 1    // a use of 'count'
-      print(count)  // last use of 'count', lifetime ends afterward
-      print("done")
+      count += 1    // a use of 'count'
+      print(count)  // last use of 'count', lifetime ends afterward
+      print("done")
     }
     ```
 
@@ -1053,7 +1229,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     fun main() {
       sink let count = 1 // lifetime of 'count' begins here
       sink _ = count     // lifetime of 'count' ends here
-      print(count)       // error: 'count' has been consumed
+      print(count)       // error: 'count' has been consumed
     }
     ```
 
@@ -1071,9 +1247,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     The lifetime of `thing` ends when `a` is initialized because construction an array literal consumes the literal's elements. A new lifetime starts before `borrow` returns as the call to `Array.remove_last` produces an independent value.
 
-## 5.6. Function declarations
+## Function declarations
 
-### 5.6.1. General
+### General
 
 1. Function declarations have the form:
 
@@ -1103,7 +1279,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```val
     fun gcd(_ a: Int, _ b: Int) -> Int {
-      if b == 0 { a } else { gcd(b, a % b) }
+      if b == 0 { a } else { gcd(b, a % b) }
     }
     ```
 
@@ -1115,7 +1291,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       
     2. A function declaration at type scope that contains a `static` modifier is called a static method declaration; it is also a global function declaration. A static method declaration introduces one global function.
 
-    3. A function declaration at type scope that does not contain a `satic` modifier is called a method declaration. It introduces one or more methods.
+    3. A function declaration at type scope that does not contain a `static` modifier is called a method declaration. It introduces one or more methods.
       
     4. A function declaration at type scope declared with `init` is called a constructor declaration. It introduces one global function.
 
@@ -1133,7 +1309,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 9.  A capture list may only appear in a function declaration at local scope.
 
-### 5.6.2. Function signatures
+### Function signatures
 
 1. Function signatures have the form:
 
@@ -1146,7 +1322,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The output type of a function signture defines the output type of the containing declaration. If that type is omitted, the output type of the declaration is interpreted as `()`.
 
-### 5.6.3. Function implementations
+### Function implementations
 
 1. The brace statement in the body of a global or local function declaration defines its implementation. A global or local  function declaration must have a function implementation, unless it is static method declaration.
 
@@ -1172,7 +1348,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-### 5.6.4. Method declarations
+### Method declarations
 
 1. A bodiless method declaration or a method declaration that contains a bodiless method implementation defines a method requirement and may only appear in a trait declaration. A bodiless static method declaration defines a static method requirement and may only appear in a trait declaration.
 
@@ -1224,7 +1400,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     The method `Vector2.scaled(by:)` has an explicit `let` implementation, an explicit `inout` implementation and a synthesized `sink` implementation. The method `Vector2.dot(_:)` has an implicit `let` implementation. The method `Vector2.transpose` has an implicit `inout` implementation.
 
-### 5.6.5. Method implementations
+### Method implementations
 
 1. A method implementation is a function implementation defined in a method. It may be defined implicitly or explicitly (see Method declarations). Explicit method implementations have the form:
 
@@ -1246,9 +1422,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
  
 5. The output type of an explicit `inout` method implementation is `()`.
 
-## 5.7. Subscript declarations
+## Subscript declarations
 
-### 5.7.1. General
+### General
 
 1. Subscript declarations have the form:
 
@@ -1272,7 +1448,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```val
     subscript min<T, E>(_ a: T, _ b: T, by comparator: [E](T, T) -> Bool): Int {
-      let    { if comparator(a, b) { yield a } else { yield b } }
+      let    { if comparator(a, b) { yield a } else { yield b } }
       inout  { if comparator(a, b) { yield &a } else { yield &b } }
       assign { if comparator(a, b) { yield &a } else { yield &b } }
       sink   { if comparator(a, b) { return a } else { return b } }
@@ -1303,7 +1479,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 10.  A capture list may only appear in a subscript declaration at local scope.
 
-### 5.7.2. Subscript signatures
+### Subscript signatures
 
 1. Subscript signatures have the form:
 
@@ -1319,7 +1495,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The output type of a subscript signture defines the output type of the containing declaration. If that type is prefixed by `var`, all projections produced by the subscript are mutable. Otherwise, only the projections produced by the `inout` implementation of the subscript are mutable.
 
-### 5.7.3. Subscript implementations
+### Subscript implementations
 
 1. A subscript implementation may be defined ikmplicitly or explicitly. Explicit subscript implementations have the form:
 
@@ -1354,7 +1530,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 let+assign = inout
 
-## 5.8. Parameter declarations
+## Parameter declarations
 
 1. Parameter declarations have the form:
 
@@ -1385,9 +1561,9 @@ let+assign = inout
 
 4. A default value must be a non-consuming expression. A default value to a `sink` parameter must evlauate to an escapable object.
 
-# 6. Statements
+# Statements
 
-## 6.1. General
+## General
 
 1. Statements of the form:
 
@@ -1404,7 +1580,7 @@ let+assign = inout
 
 3. Statements do not require explicit statement delimiter. Semicolons can be used to separate statements explicitly, for legibility or to disambiguate exceptional situations. [Note: A common practice is to write each statement on a new line.]
 
-## 6.2. Brace statements (a.k.a. code blocks)
+## Brace statements (a.k.a. code blocks)
 
 1. Brace statements are sequences of statements executed in a lexical scope.
 
@@ -1422,9 +1598,9 @@ let+assign = inout
 
 4. Control enters the lexical scope of a brace statement before executing any sub-statements and exits that lexical scope when it reaches the end of the brace statement.
 
-## 6.3. Loop statments
+## Loop statments
 
-### 6.3.1. General
+### General
 
 1. Loop statements describe iteration. They have the form:
 
@@ -1441,7 +1617,7 @@ let+assign = inout
 
 4. A continuation test is a procedure that determines whether an additional iteration should take place, or whether control should exit the loop. A continuation test may take in the head or in the body of a loop.
 
-### 6.3.2. Do-while statments
+### Do-while statments
 
 1. `do-while` statements have the form:
 
@@ -1466,7 +1642,7 @@ let+assign = inout
 
 4. The head of a `do-while` statement unconditionally transfers control to the body of the loop. The tail performs a continuation test. If it succeeds, control is transferred back to the head. Otherwise, it exits the loop.
 
-### 6.3.3. While statments
+### While statments
 
 1. `while` statements have the form:
 
@@ -1486,7 +1662,7 @@ let+assign = inout
 
 3. The head of a `while` statement performs a continuation test. If it succeeds, control is transferred to the body of the loop. Otherwise, it exits the loop. The tail unconditionally transfers control back to the head.
 
-### 6.3.4. For statements
+### For statements
 
 1. `for` statements have the form:
 
@@ -1561,9 +1737,9 @@ let+assign = inout
     }
     ```
 
-## 6.4. Jump statements
+## Jump statements
 
-### 6.4.1. General
+### General
 
 1. Jump statements unconditionally transfer control. They have the form:
 
@@ -1580,13 +1756,13 @@ let+assign = inout
 
 2. `break` and `continue` statements are called loop jump statements. A loop jump statement applies to the innermost loop.
 
-### 6.4.2. Return statments
+### Return statments
 
 1. Return statements return an object from a function, terminating the execution path and transferring control back to the function's caller.
 
 2.  The expression in a return statement is called its operand. If the operand is omitted, it is interpreted as `()`. A return statement consumes the value of the operand to initialize an escapable object as result of the call to the containing function.
 
-### 6.4.3. Yield statments
+### Yield statments
 
 1. Yield statements project an object out of a subscript, suspending the execution path and temporarily transferring control to the subscript's caller. Control comes back to the subscript once after the last use of the yielded projection at the call site, resuming execution at the statement that directly follows the yield statement.
 
@@ -1612,31 +1788,31 @@ let+assign = inout
 
 3. The expression in a yield statement is called its operand. A yield statement projects the value of its operand as the result of the call to the containing subscript. The yielded object is projected immutably in a `let` subscript implementation and mutably in an `inout` subscript implementation. The mutability marker `&` must prefix a mutable projection.
 
-### 6.4.4. Break statements
+### Break statements
 
 1. Break statements exit a loop. Control is transferred to the statement immediately following the loop, if any.
 
-### 6.4.5. Continue statements
+### Continue statements
 
 1. Continue statements skip the remainder of a loop body. Control is transferred to the begin of the loop.
 
-# 7. Value expressions
+# Value expressions
 
-## 7.1. General
+## General
 
 1. An expression is a sequence of operators and operands that specifies a computation. An expression results in a value and may cause side effects.
 
 2. If during the evaluation of an expression, the result is not mathematically defined or not in the range of representable values for its type, the behavior is undefined.
 
-## 7.2. Properties of expressions
+## Properties of expressions
 
-### 7.2.1. Consuming expressions
+### Consuming expressions
 
 1. An expression is consuming if and only if its evaluation may end the lifetime of one or objects not created by the expression's evaluation.
 
-## 7.3. Primary expressions
+## Primary expressions
 
-### 7.3.1. General
+### General
 
 1. Primary expressions have the form:
 
@@ -1656,7 +1832,7 @@ let+assign = inout
       '_'
     ```
 
-### 7.3.2. Scalar literals
+### Scalar literals
 
 1. Scalar literals have the form:
 
@@ -1668,9 +1844,9 @@ let+assign = inout
       STRING-LITERAL
     ```
 
-### 7.3.3. Compound literals
+### Compound literals
 
-#### 7.3.3.1. General
+#### General
 
 1. Compound literals have the form:
 
@@ -1682,7 +1858,7 @@ let+assign = inout
 
 2. A compound literal consumes the value of each of its components.
 
-#### 7.3.3.2. Buffer literals
+#### Buffer literals
 
 1. Buffer literals have the form:
 
@@ -1706,7 +1882,7 @@ let+assign = inout
     let e: Int[] = []        // warning: zero-lenght buffer
     ```
 
-#### 7.3.3.3. Map literal
+#### Map literal
 
 1. Map literals have the form:
 
@@ -1736,7 +1912,7 @@ let+assign = inout
     let e: Map<Double, String> = [:] // OK
     ```
 
-### 7.3.4. Primary declaration references
+### Primary declaration references
 
 1. Primary declaration references have the form:
 
@@ -1745,7 +1921,7 @@ let+assign = inout
       ident-expr type-argument-list?
     ```
 
-### 7.3.5. Identifiers
+### Identifiers
 
 1. Identifiers have the form:
 
@@ -1765,7 +1941,7 @@ let+assign = inout
       (IDENT | '_') ':'
 
     impl-ident ::=
-      '#' method-introducer
+      '.' method-introducer
     ```
 
 2. An identifier may not have any whitespace between its constituent tokens.
@@ -1804,15 +1980,15 @@ let+assign = inout
 
     }
 
-    let f = Vector2.scaled(by:)#let  // OK
-    let g = Vector2.scaled(by:)#sink // OK
+    let f = Vector2.scaled(by:).let  // OK
+    let g = Vector2.scaled(by:).sink // OK
     ```
 
-## 7.4. Compound expressions
+## Compound expressions
 
-### 7.4.1. Member accesses
+### Member accesses
 
-#### 7.4.1.1. General
+#### General
 
 1. Member accesses have the form:
 
@@ -1826,9 +2002,9 @@ let+assign = inout
 
 3. A value member access whose base is an expression is called an unbound value member access.
 
-### 7.4.2. Function calls
+### Function calls
 
-#### 7.4.2.1. General
+#### General
 
 1. Function calls have the form:
 
@@ -1857,9 +2033,9 @@ let+assign = inout
 
 3. Arguments to `sink` parameters are consumed. Arguments to `let` parameters are projected immutably in the entire call expression. Arguments to `inout` and `set` parameters are projected mutably in the entire call expression.
 
-## 7.5. Operators
+## Operators
 
-### 7.5.1. Operator notations
+### Operator notations
 
 1. Operator notations have the form:
 
@@ -1870,16 +2046,16 @@ let+assign = inout
       'postfix'
     ```
 
-# 8. Type expressions
+# Type expressions
 
-## 8.1. Tuple types
+## Tuple types
 
 1. A tuple type is a structural type composed of zero or more ordered *operands*. An operand is a type together with an optional label.
 
-## 8.2. Function and lambda types
+## Function and lambda types
 
-## 8.3. Union types
+## Union types
 
-## 8.4. Existential types
+## Existential types
 
-## 8.5. Type aliases
+## Type aliases
