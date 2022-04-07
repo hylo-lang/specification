@@ -27,9 +27,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ## Comments
 
-1. The character sequence `//` start a single-line comment, which terminates immediately before the next new-line delimiter.
+1. The character sequence `//` starts a single-line comment, which terminates immediately before the next new-line delimiter.
 
-2. The character sequences `/*` and `*/` denote multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest, and need not contain any new-line characters.
+2. The character sequences `/*` and `*/` are multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest, and need not contain any new-line characters.
 
 3. The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.
 
@@ -68,11 +68,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       decimal-literal
       hexadecimal-literal
 
-    binary-literal ::=
-      '0b' binary-digit+ '_'?
-
-    binary-digit ::= (one of)
-      0 1
+    binary-literal ::= '0b' ('0' | '1' | '_')+
 
     octal-literal ::=
       0o octal-digit
@@ -98,7 +94,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       0 1 2 3 4 5 6 7 8 9 a A b B c C d D e E f F
     ```
 
-2. The sequence of digits of a literal are interpreted as follows, ignoring all occurences of `_`:
+2. The sequence of digits of a literal are interpreted as follows, ignoring all occurrences of `_`:
 
     1. In a binary literal, as a base 2 integer.
    
@@ -149,7 +145,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       + -
     ```
 
-2. The significand of a decimal floating-point literal the __decimal-fractional-constant__ or the __decimal-literal__ preceeding the __exponent__. The signficand of a hexadecimal floating-point literal is the __hexadecimal-fractional-constant__ or the __hexadecimal-literal__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10 for a decimal floating-point literal and 16 for a hexadecimal floating-point literal, ignoring all occurences of `_`. If __exponent__ or __binary-exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e` for a decimal floating-point literal and `s × 2e` for a hexadecimal floating-point literal.
+2. The significand of a decimal floating-point literal the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. The significand of a hexadecimal floating-point literal is the __hexadecimal-fractional-constant__ or the __hexadecimal-literal__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10 for a decimal floating-point literal and 16 for a hexadecimal floating-point literal, ignoring all occurrences of `_`. If __exponent__ or __binary-exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e` for a decimal floating-point literal and `s × 2e` for a hexadecimal floating-point literal.
 
 3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the scaled value if representable, else the larger or smaller representable value nearest the scaled value, chosen in an implementation-defined manner.
 
@@ -172,7 +168,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     unicode-escape ::=
       \u hexadecimal-digit
     
-    c-char ::= (any unicode character except ')
+    c-char ::= (any Unicode character except ')
     ```
 
 2. The __hexadecimal-digit__  of a __unicode-escape__ represents a Unicode scalar value.
@@ -225,13 +221,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     print(s) // "  Hello,\n  World!"
     ```
 
-### Keyowrds
+### Keywords
 
-1. A keywords are reserved identifiers. They have the form:
+1. Keywords are reserved identifiers. They have the form:
 
     ```ebnf
     keyword ::= (one of)
-      Any Never as as! _as!! async await break catch conforance continue deinit else extension
+      Any Never as as! _as!! async await break catch conformance continue deinit else extension
       false for fun if import in infix init let match namespace nil postfix prefix private public
       return sink static true try type typealias var where while yield
     ```
@@ -302,7 +298,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The lexical scope of a module or namespace declaration is called a *global scope*. The lexical scope of a type, extension, trait, or conformance declaration is called a *type scope*. Unless specified otherwise, the lexical scope of any other syntactic element is called a *local scope*.
 
-3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text delimited by `l1` includes that delimited by `l2`. The innermost lexical scope that contains a lexical scope is called its *parent*.
+3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text delimited by `l1` includes that delimited by `l2`. The innermost lexical scope that contains a lexical scope `l1` and that is not `l1` is called the *parent* of `l1`.
 
 4. A lexical scope `l1` is a *sibling* of a lexical scope `l2` if `l1` is the lexical scope of a trait, nominal product type, or type alias declaration `d` and `l2` is the lexical scope of an extension or conformance declaration for the entity declared by `d`, or if `l2` is a sibling of `l1`.
 
@@ -445,7 +441,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     3. A memory location allocated by a call to `Builtin.aligned_alloc(alignment:byte_count:)` has *dynamic lifetime* and is called a *dynamic memory location*.
 
-2. A program shall terminate the lifetime of a dynamic memory location by calling `Builtin.dealloc`. Behavior is undfined if a program calls `Builtin.dealloc` to dealloacte a static or automatic memory location.
+2. A program shall terminate the lifetime of a dynamic memory location by calling `Builtin.dealloc`. Behavior is undefined if a program calls `Builtin.dealloc` to deallocate a static or automatic memory location.
 
 3. A memory location shall not be occupied by an initializing, alive, or deinitializing object when it reaches the end of its lifetime.
 
@@ -482,13 +478,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. The lifetime of an object of type `A` begins when:
    
     1. a memory location has been allocated and bound to `A`, and 
-
     2. its initialization is complete.
 
 2. The lifetime of an object of type `A ` ends when:
   
     1. its destructor has returned, and
-    
     2. the memory location it occupies is rebound, resued for another object, or deallocated.
 
 3. The properties ascribed to objects throughout this document apply for a given object only during its lifetime. [Note: The behavior of an object under construction and destruction might not be the same as the behavior of an object whose lifetime has started and not ended.]
@@ -507,7 +501,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Object alignment
 
-1. Object types have alignment requirements which place restrictions on the addresses of the memory locations which an object of that type may occupy. An alignment is an plateform-specific integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type.
+1. Object types have alignment requirements which place restrictions on the addresses of the memory locations which an object of that type may occupy. An alignment is an platform-specific integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type.
 
 2. Alignments are represented as values of the type `Int`. Valid alignments include only those values of `MemoryLayout<A>.alignnment` for any type `A` plus the value of `Pointer.universal_alignment`. Every alignment value shall be a non-negative integral power of two.
 
@@ -697,7 +691,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
       - `(A | B) <: (A | B | C)`
 
-      - `[E] ((A2) -> B1) <: ((A1) -> B2)`, assuming `A1 <: A2` and `B1 <: B2`
+      - `[E] ((A2) -> B1) <: ((A1) -> B2)` (where `A1 <: A2` and `B1 <: B2`)
       
       - `(T & U & V) <: (T & U)`
       
@@ -711,7 +705,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Access modifiers
 
-1. A name is *exposed* to a lexical scope if it can be referred to from that scope. When a name is exposed in a lexical scope, it is exposed in all scopes contained in that scope. An access modifier specifies how a declaration exposes the names it introduces. Access modifiers have the form:
+1. A name is *exposed* to a lexical scope if it can be referred to from that scope. When a name is exposed to a lexical scope, it is exposed to all scopes contained in that scope. An access modifier specifies how a declaration exposes the names it introduces. Access modifiers have the form:
 
     ```ebnf
     access-modifier ::=
@@ -850,10 +844,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       trait-head trait-body
 
     trait-head ::=
-      access-modifier? 'trait' identifier conformance-list
+      access-modifier? 'trait' identifier trait-refinement-list
 
     trait-refinement-list ::=
-      ':' type-identifier (',' type-identifier)
+      ':' type-name (',' type-name)
 
     trait-body ::=
       '{' trait-requirement-decl-list? '}'
@@ -1133,11 +1127,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       binding-head binding-type-annotation? binding-initializer?
 
     binding-head ::=
-      'sink'? binding-introducer pattern
+      access-modifier? member-modifier* binding-introducer pattern
     
     binding-introducer ::=
       'let'
       'var'
+      'sink let'
+      'sink var'
       'inout'
     
     binding-type-annotation ::=
@@ -1155,7 +1151,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     This binding declaration defines two new immutable bindings: `name` and `age`.
 
-3. A binding declaration defines a new binding for each named pattern in pattern. All new bindings are defined with the same capabilities.
+3. A binding declaration defines a new binding for each name pattern in pattern. All new bindings are defined with the same capabilities.
 
     1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
@@ -1255,10 +1251,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     fun-decl ::=
+      'default init'
       fun-head fun-signature fun-body?
 
     fun-head ::=
-      member-modifier* fun-ident generic-clause? capture-list?
+      access-modifier? member-modifier* fun-ident generic-clause? capture-list?
 
     fun-ident ::=
       'init'
@@ -1269,7 +1266,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     fun-body ::=
       fun-bundle-body
       brace-stmt
-      '=' 'default'
     
     fun-bundle-body ::=
       '{' method-impl+ '}'
@@ -1303,7 +1299,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 6. A method implementation may only appear in a method declaration.
 
-7. A declaration whose body has the form `= default` is called an explicitly defaulted. An explicitly default declaration may only be a constructor declaration in a product type declaration.
+7. A function declaration of the form 'default init' is an *explicit default constructor* and may only appear in a product type declaration.
 
 8.  An operator notation specifier defines an operator member function; it may only appear in a function declaration at type scope.
 
@@ -1529,6 +1525,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 7. A `sink` subscript implementation must have a return statement on every terminating execution path. It must return an escapable object whose type is subtype of the output type of the containing subscript declaration.
 
 let+assign = inout
+    ```
 
 ## Parameter declarations
 
@@ -1560,6 +1557,16 @@ let+assign = inout
 3. A `let` parameter of a `sink` parameter may have a default value.
 
 4. A default value must be a non-consuming expression. A default value to a `sink` parameter must evlauate to an escapable object.
+
+## Capture lists
+
+1. Capture lists have the form:
+
+    ```ebnf
+    capture-list ::=
+      '[' binding-decl (',' binding-decl)* ']'
+
+2. The bindings of a capture list may not have access or member modifiers.
 
 # Statements
 
