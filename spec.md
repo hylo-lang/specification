@@ -300,7 +300,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 6. (Example)
 
-    ```ebnf
+    ```val
     type A {
       fun foo() {}
     }
@@ -313,7 +313,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. The same name may not be introduced more than once in a declaration space.
 
-    ```ebnf
+    ```val
     type A {
       fun foo() {}
     }
