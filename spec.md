@@ -241,22 +241,20 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. Identifiers are case-sensitive sequences of letters and digits. They have the form:
 
     ```ebnf
-    identifier ::=
-      identifier-head
-      identifier identifier-tail
-      backquoted-identifier
+    identifier ::= (token)
+      identifier-head identifier-tail*
+      '`' bq-char+ '`'
       contextual-keyword
 
-    identifier-head ::= (_ and any character in categories Lu, Ll, Lt, Lm, Lo, Nl)
+    identifier-head ::= (regexp)
+      [_\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}]
 
-    identifier-tail ::= (any character in categories Lu, Ll, Lt, Lm, Lo, Mn, Mc, Nl, Nd, Pc)
-
-    backquoted-identifier ::=
-      backquoted-identifier-head bq-char `
-      backquoted-identifier bq-char `
-
-    bq-char ::= (any character except `, U+A, and U+D)
-
+    identifier-tail ::= (regexp)
+      [\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}]
+    
+    bq-char ::= (regexp)
+      [^`\x0a\x0d]
+      
     contextual-keyword ::= (one of)
       mutating size any
     ```
@@ -268,7 +266,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. Raw operators have the form:
 
     ```ebnf
-    raw-operator ::= (-, *, /, ^, %, &, ! ?, and any character in category Sm)
+    raw-operator ::= (regexp)
+      [-*/^%&!?\p{Sm}]
     ```
 
     [Note: The Unicode category Sm includes +, =, <, >, |, and ~.]
