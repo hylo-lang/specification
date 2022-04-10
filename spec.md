@@ -643,7 +643,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. A type is *instantiable* if it can be the type of an object. An instantiable type `A` has a memory layout that defines the *size* and *alignment* requirements to bind a memory location to `A`.
 
-4. The *object representation* of an object is the set of bytes that it occupies in storage. The *value representation* of an object of type `A` is the set of bits that participate in representing a value of type `A`. Bits in the object representation that are not part of the value representation are called *padding bits*.
+4. A type has a *type representation* if it can be represented at compile-time. [Note: type representation can be understood as the object representation of a type expression in the compile-time interpreter.]
+
+5. The *object representation* of an object is the set of bytes that it occupies in storage. The *value representation* of an object of type `A` is the set of bits that participate in representing a value of type `A`. Bits in the object representation that are not part of the value representation are called *padding bits*.
 
 ## Built-in types
 
@@ -1754,11 +1756,8 @@ let+assign = inout
     jump-stmt ::=
       'return' expr?
       'yield' expr
-      'break' jump-stmt-label?
-      'continue' jump-stmt-label?
-
-    jump-stmt-label ::=
-      IDENT
+      'break'
+      'continue'
     ```
 
 2. `break` and `continue` statements are called loop jump statements. A loop jump statement applies to the innermost loop.
