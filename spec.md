@@ -52,9 +52,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. The Boolean literals are `true` and `false`:
 
     ```ebnf
-    boolean-literal ::=
-      true
-      false
+    boolean-literal ::= (one of)
+      true false
     ```
 
 #### Integer literals
@@ -68,30 +67,29 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       decimal-literal
       hexadecimal-literal
 
-    binary-literal ::= '0b' ('0' | '1' | '_')+
+    binary-digit ::= (one of)
+      0 1 _
 
-    octal-literal ::=
-      0o octal-digit
-      0o _
-      octal-literal octal-digit
-      octal-literal _
+    binary-literal ::= (token)
+      '0b' binary-digit+
 
     octal-digit ::= (one of)
-      0 1 2 3 4 5 6 7
+      0 1 2 3 4 5 6 7 _
 
-    decimal-literal ::=
-      decimal-digit
-      decimal-literal decimal-digit
-      decimal-literal _
+    octal-literal ::= (token)
+      '0o' octal-digit+
 
-    hexadecimal-literal
-      0x hexadecimal-digit
-      0x _
-      hexadecimal-literal hexadecimal-digit
-      hexadecimal-literal _
+    decimal-digit ::= (one of)
+      0 1 2 3 4 5 6 7 8 9 _
+
+    decimal-literal ::= (token)
+      decimal-digit+
 
     hexadecimal-digit ::= (one of)
-      0 1 2 3 4 5 6 7 8 9 a A b B c C d D e E f F
+      0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f _
+
+    hexadecimal-literal ::= (token)
+      '0x' hexadecimal-digit+
     ```
 
 2. The sequence of digits of a literal are interpreted as follows, ignoring all occurrences of `_`:
@@ -119,27 +117,27 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       decimal-floating-point-literal
       hexadecimal-floating-point-literal
 
-    decimal-floating-point-literal ::=
+    decimal-floating-point-literal ::= (token)
       decimal-fractional-constant exponent?
       decimal-literal exponent
 
-    decimal-fractional-constant ::=
+    decimal-fractional-constant ::= (token)
       decimal-literal . decimal-literal
 
-    exponent ::=
-      e exponent-sign? decimal-literal
-      E exponent-sign? decimal-literal
+    exponent := (token)
+      'e' exponent-sign? decimal-literal
+      'E' exponent-sign? decimal-literal
 
-    hexadecimal-floating-point-literal ::=
-      hexadecimal-fractional-constant binary-exponent
+    hexadecimal-floating-point-literal ::= (token)
+      hexadecimal-fractional-constant binary-exponent?
       hexadecimal-literal binary-exponent
 
-    hexadecimal-fractional-constant ::=
-      hexadecimal-literal . hexadecimal-literal
+    hexadecimal-fractional-constant ::= (token)
+      hexadecimal-literal '.' hexadecimal-literal
 
-    binary-exponent ::=
-      p exponent-sign? decimal-literal
-      P exponent-sign? decimal-literal
+    binary-exponent := (token)
+      'p' exponent-sign? decimal-literal
+      'P' exponent-sign? decimal-literal
 
     exponent-sign ::= (one of)
       + -
@@ -149,14 +147,14 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
-#### Character literals
+#### Unicode scalar literals
 
-1. Character literals have the form:
+1. Unicode scalar literals have the form:
 
     ```ebnf
-    character-literal ::=
-      ' escape-char '
-      ' c-char '
+    unicode-scalar-literal ::= (token)
+      single-quote escape-char single-quote
+      single-quote c-char single-quote
 
     escape-char ::=
       simple-escape
@@ -165,10 +163,14 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     simple-escape ::= (one of)
       \0 \t \n \r \' \"
 
-    unicode-escape ::=
-      \u hexadecimal-digit
+    single-quote ::= (one of)
+      '
 
-    c-char ::= (any Unicode character except ')
+    unicode-escape ::= (token)
+      '\u' hexadecimal-digit+
+
+    c-char ::= (regexp)
+      [^']
     ```
 
 2. The __hexadecimal-digit__  of a __unicode-escape__ represents a Unicode scalar value.
@@ -183,7 +185,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       multiline-string
 
     simple-string ::=
-      " simple-quoted-text? "
+      '"' simple-quoted-text? '"'
 
     simple-quoted-text ::=
       simple-quoted-text-item
