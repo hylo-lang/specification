@@ -184,10 +184,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       simple-string
       multiline-string
 
-    simple-string ::=
+    simple-string ::= (token)
       '"' simple-quoted-text? '"'
 
-    simple-quoted-text ::=
+    simple-quoted-text ::= (token)
       simple-quoted-text-item
       simple-quoted-text simple-quoted-text-item
 
@@ -195,12 +195,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       escape-char
       s-char
 
-    s-char ::= (any character except ", U+A, and U+D)
-
-    multiline-string ::=
+    s-char ::= (regexp)
+      [^"\x0a\x0d]
+      
+    multiline-string ::= (token)
       """ multiline-quoted-text """
 
-    multiline-quoted-text ::=
+    multiline-quoted-text ::= (token)
       multiline-quoted-text-item
       multiline-quoted-text multiline-quoted-text-item
 
@@ -208,7 +209,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       escape-char
       m-char
 
-    m-char ::= (any character except " leading a sequence of 3 or more contiguous ")
+    m-char ::= (regexp)
+      [^"]|"(?!"")
     ```
 
 2. The first new-line delimiter in a multiline string literal is not part of the value of that literal if it immediately succeeds the opening delimiter. The last new-line delimiter that is succeeded by a contiguous sequence of inline spaces followed by the closing delimiter is called the indentation marker. The indentation marker and the succeeding inline spaces specify the indentation pattern of the literal and are not part of its value. The pattern is defined as the sequence of inline spaces between the indentation marker and the closing delimiter. That sequence must be homogeneous. If the literal has no indentation marker, its indentation pattern is an empty sequence. Each line of a multiline string literal must begin with the indentation pattern of that literal. That prefix is not part of the value of the literal.
