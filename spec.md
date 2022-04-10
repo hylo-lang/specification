@@ -15,11 +15,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 2. This document refers to individual Unicode characters with the notation `U+n` where `n` is a hexadecimal value representing a Unicode code point, and refers to the Unicode general categories to identify groups of Unicode characters.
 
 ## Lexical translations
-    
+
 1. A sequence of Unicode characters is translated into a sequence of tokens. The following rules apply during translation:
 
     1. Comments are treated as though they are a single space `U+20`.
-    
+
     2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+9` and/or `U+20` are recognized as spaces.
 
     3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A` are recognized as new-line delimiters.
@@ -97,11 +97,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 2. The sequence of digits of a literal are interpreted as follows, ignoring all occurrences of `_`:
 
     1. In a binary literal, as a base 2 integer.
-   
+
     2. In an octal literal, as a base 8 integer.
 
     3. In a decimal literal, as a base 10 integer.
-    
+
     4. In a hexadecimal literal, as a base 16 integer, where the characters `a` through `f` and `A` through `F` have decimal values ten through fifteen.
 
 3. (Example)
@@ -161,13 +161,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     escape-char ::=
       simple-escape
       unicode-escape
-    
+
     simple-escape ::= (one of)
       \0 \t \n \r \' \"
 
     unicode-escape ::=
       \u hexadecimal-digit
-    
+
     c-char ::= (any Unicode character except ')
     ```
 
@@ -334,7 +334,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     - If `qlookup(n, s) = E` and:
 
         - if `E` contains an entity `e` that is a local binding and `n` occurs after the declaration of `e` in the program text, `ulookup(n, s) = E`; or
-      
+
         - if `E` is not empty, `ulookup(n, s) = E`;
 
     - otherwise:
@@ -354,11 +354,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     - If `qslookup(n, s) = E` and:
 
       - if `n` is a bare name, `qlookup(n, s) = E`; or
-      
+
       - if `n` is a method name, `qlookup(n, s) = E'` where `E'` contains the entities in `E` identified by a method name `m` whose method introducer is equal to that of `n`; or
 
       - `qlookup(n, s) = E'` where `E'` contains the entities in `E` identified by `n`;
-    
+
     - otherwise, `qslookup(n, s) = {}`.
 
 3. (Example)
@@ -401,9 +401,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. A program consists of one or more module declarations linked together.
 
 2. A name is said to have linkage when it might denote the same entity a name introduced by a declaration in another scope.
-   
+
     1. When a name has *external linkage*, the entity it denotes can be referred to by names from any scope contained in other module declarations or from other scopes of the same module declaration.
-    
+
     2. When a name has *module linkage*, the entity it denotes can be referred to by names from any scope in the same module declaration.
 
     3. When a name has *internal linkage*, the entity it denotes can be referred to by names from any scope contained in the scope that contains its declaration.
@@ -419,14 +419,14 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 4. A memory location may contain other memory locations, called sub-locations. A memory location that is not a sub-location of any other memory location is called a *root location*. A memory location `l1` must be disjoint from another memory location `l2` unless unless `l1`
 
 5. A memory location may be *bound* to a type `A`. Such a memory location shall have the size and alignment suitable to store an object of type `A` and shall not contain any other memory location. Otherwise, the behavior is undefined. The memory locations contained in a memory location bound to `A` are bound according to the memory layout of `A`.
-  
+
 6. A memory location bound to `A` may be used as storage for an object of type `A`. A bound memory location shall not be rebound to another type or deallocated if it is used as storage for an object whose lifetime has not yet ended, or if it is contained in a bound memory location. Otherwise, the behavior is undefined.
 
 ### Memory location lifetime
 
 1. The lifetime of a memory location starts when it is allocated and ends when it is deallocated. The lifetime of a memory location falls in one of three categories: *static*, *automatic*, or *dynamic*. The lifetime category is determined by the construct used to allocate the memory location.
 
-    1. A memory location allocated for an object declared by a global binding declaration has *static lifetime* and is called a *static memory location*. 
+    1. A memory location allocated for an object declared by a global binding declaration has *static lifetime* and is called a *static memory location*.
 
     2. A memory location allocated for an object declared by a local binding has *automatic lifetime* and is called an *automatic memory location*.
 
@@ -451,7 +451,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 5. An object `o1` is nested within another object `o2` if and only if:
 
     1. `o1` is a sub-object of `o2`; or
-    
+
     2. there exists an object `o3` such that `o1` is nested within `o3` and `o3` is nested within `o1`.
 
 6. For every object `o`, there exists a single root object `o`, determined as follows:
@@ -467,12 +467,12 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 ### Object lifetime
 
 1. The lifetime of an object of type `A` begins when:
-   
-    1. a memory location has been allocated and bound to `A`, and 
+
+    1. a memory location has been allocated and bound to `A`, and
     2. its initialization is complete.
 
 2. The lifetime of an object of type `A ` ends when:
-  
+
     1. its destructor has returned, and
     2. the memory location it occupies is rebound, resued for another object, or deallocated.
 
@@ -503,7 +503,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     1. Two alignments are equal when their numeric values are equal.
 
     2. Two alignments are different when their numeric values are not equal.
-    
+
     3. When an alignment is larger than another it represents a stricter alignment.
 
 ### Sinkability
@@ -553,7 +553,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 2. An object `o1` projects an object `o2` if and only if:
 
     1. `o1` is a projection of `o2` or one of `o2`'s sub-objects; or
-    
+
     2. a sub-object of `o1` projects `o2`.
 
 3. When an object `o1` projects an object `o2`, `o2` is said to be projected by o1`. [Note: Copying creates a new object that is not a projection.]
@@ -565,7 +565,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     fun main() {
       let x = A()
-      let y = x.zero 
+      let y = x.zero
         // the value of 'y' projects that of 'x'
         // corollary: the value of 'x' is projected by that of 'y'
     }
@@ -583,7 +583,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
 
     fun main() {
-      let comparator = Int.< 
+      let comparator = Int.<
       let (x, y) = (2, 3)
       let z = min[x, y, by: comparator]
         // the value of 'z' projects both the values of 'x' and 'y',
@@ -655,7 +655,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. The types form a lattice, partially ordered by a subtyping relation `<:`, for which the least (and only) upper bound is `Any` and the greatest (and only) lower bound is `Never`.
 
 2. If a type `A1` is equivalent to a type `A2`, then `A1 <: A2`.
-    
+
 3. If the canonical form of a type `A1` is subtype of the canonical form of a type `A2`, then `A1 <: A2`.
 
 4. If `A1` and `A2` are union types, `A1 <: A2` if all operands of `A1` are subtype of `A2`. If `A2` is a union type and `A1` is not, `A1 <: A2` if `A1` is subtype of at least one operand of `A2`.
@@ -663,15 +663,15 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 5. If `A1` and `A2` are function types, `A1 <: A2` if:
 
     1. `A1` and `A2` have the same number of parameters and labels; and
-    
+
     2. the type of each parameter of `A2` is subtype of the type of the corresponding parameter of `A1`; and
-    
+
     3. the return type of `A1` is subtype of the return type of `A2`.
 
 6. If `A1` and `A2` are lambda types, `A1 <: A2` if:
 
-    1. the function type of `A1` is subtype of the function type of `A2`; and 
-    
+    1. the function type of `A1` is subtype of the function type of `A2`; and
+
     2. the environment of `A1` and `A2` are both equivalent or the environnment of `A2` is erased.
 
 7. If `A1`and `A2` are existential types, `A1 <: A2` if the traits of `A2` are coarser than the traits of `A1` and the associated types of `A1` are equivalent to the associated types of `A2`.
@@ -685,9 +685,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       - `(A | B) <: (A | B | C)`
 
       - `[E] ((A2) -> B1) <: ((A1) -> B2)` (where `A1 <: A2` and `B1 <: B2`)
-      
+
       - `(T & U & V) <: (T & U)`
-      
+
       - `(any T & U where ::T.Element == Int) <: (any T where ::T.Element == Int)`
 
 ## Generic types
@@ -745,7 +745,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     member-modifier ::=
       receiver-modifier
       static-modifier
-    
+
     receiver-modifier ::=
       'sink'
       'inout'
@@ -779,17 +779,17 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     generic-clause ::=
       '<' generic-param (',' generic-param)* where-clause? '>'
-    
+
     generic-param ::=
       generic-type-param
       generic-size-param
-    
+
     generic-type-param ::=
       identifier '...'? trait-annotation?
 
     trait-annotation ::=
       ':' trait-composition
-    
+
     generic-size-param ::=
       identifier ':' 'size'
     ```
@@ -825,7 +825,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 2. A where clause specifies constraints on the generic parameters introduced by a generic signature, or the associated type requirements introduced by a trait declaration.
 
     1. An equality constraint specifies that the types denoted by either side of `==` must be equivalent.
-    
+
     2. A conformance constraint specifies that the type denoted by the left hand side of `:` be conforming to the traits specified in __trait-composition__.
 
     3. A size constraint is an expression denoting a predicate over one or more size parameters. It must be an expression of type `Bool` and shall only refer to size parameters or names introduced in global scopes.
@@ -975,7 +975,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     // declares conformance to 'T'
     type A: T {}
-    
+
     // satisfies conformance to 'T'
     extension A {
       fun foo() {}
@@ -992,21 +992,21 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 4. The conformance of a type `A` to `T` is *exposed* to a lexical scope `l` if and only if `A` is exposed to `l` and the source of the conformance is:
 
     1. the declaration of `A`; or
-    
+
     2. a conformance declaration declared in `l` or a lexical scope that contains `l`; or
-    
+
     3. an external conformance declaration imported from another module.
 
 5. The conformance of a type `A` to a trait `T` shall not be exposed outside of the lexical scope of a module `m` unless at least `A` or `T` is declared in `m`.
- 
+
 6. (Example)
 
     ```val
     import M
-    
+
     public type A {}
     conformance A: M.T    // OK: conformance is private
-    
+
     type B: M.T {}        // OK: 'B' is not exposed outside of the module
 
     public type C: M.T {} // error: cannot expose conformance to imported trait 'M.T'
@@ -1025,11 +1025,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       product-type-head product-type-body
 
     product-type-head ::=
-      access-modifier? identifier generic-clause? conformance-list 
+      access-modifier? identifier generic-clause? conformance-list
 
     product-type-body ::=
       '{' product-type-member-decl-list? '}'
-    
+
     product-type-member-decl-list
       product-type-member-decl (';'* product-type-member-decl)+ ';'*
 
@@ -1049,14 +1049,14 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     type-alias-decl ::=
       type-alias-head type-alias-body
-    
+
     type-alias-head ::=
       access-modifier? 'typealias' identifier generic-clause?
 
     type-alias-body ::=
       '=' type-expr
       '=' union-decl
-    
+
     union-decl ::=
       product-type-decl ('|' product-type-decl)*
     ```
@@ -1070,13 +1070,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     extension-decl ::=
       extension-head extension-body
-    
+
     extension-head ::=
       'extension' type-expr where-clause?
 
     extension-body ::=
       '{' extension-member-decl-list? '}'
-    
+
     extension-member-decl-list
       extension-member-decl (';'* extension-member-decl)+ ';'*
 
@@ -1098,13 +1098,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     conformance-decl ::=
       conformance-head conformance-body
-    
+
     conformance-head ::=
       access-modifier? 'conformance' type-expr ':' trait-composition where-clause?
 
     conformance-body ::=
       '{' conformance-member-decl-list? '}'
-    
+
     conformance-member-decl-list
       conformance-member-decl (';'* conformance-member-decl)+ ';'*
 
@@ -1127,17 +1127,17 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     binding-head ::=
       access-modifier? member-modifier* binding-introducer pattern
-    
+
     binding-introducer ::=
       'let'
       'var'
       'sink let'
       'sink var'
       'inout'
-    
+
     binding-type-annotation ::=
       ':' type-expr
-    
+
     binding-initializer ::=
       '=' expr
     ```
@@ -1165,9 +1165,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 5. A binding declaration may be defined at module scope, namespace scope, type scope, or function scope.
 
     1. A binding declaration at module scope or namespace scope is called a global binding declaration. It introduces one or more global bindings. A global binding declaration must be introduced with `let`.
-      
+
     2. A binding declaration at type scope is called a static member binding declaration if it contains a `static` modifier. Otherwise, it is called a member binding declaration. A static member binding declaration introduces one or more global bindings. A member binding declaration introduces one or more member bindings.
-      
+
     3. A binding declaration at function scope is called a local binding declaration. It introduces one or more local bindings.
 
 6. The `sink` capability may only appear in a local binding declaration introduced with `let` or `var`.
@@ -1265,7 +1265,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     fun-body ::=
       fun-bundle-body
       brace-stmt
-    
+
     fun-bundle-body ::=
       '{' method-impl+ '}'
     ```
@@ -1278,20 +1278,20 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-3. A function declaration introduces one or more function objects.    
+3. A function declaration introduces one or more function objects.
 
 4. A function declaration may be defined at module scope, namespace scope, type scope, or function scope.
 
     1. A function declaration at module scope or namespace scope is called a global function declaration. It introduces one global function.
-      
+
     2. A function declaration at type scope that contains a `static` modifier is called a static method declaration; it is also a global function declaration. A static method declaration introduces one global function.
 
     3. A function declaration at type scope that does not contain a `static` modifier is called a method declaration. It introduces one or more methods.
-      
+
     4. A function declaration at type scope declared with `init` is called a constructor declaration. It introduces one global function.
 
     5. A function declaration at type scope declared with `deinit` is called a destructor declaration. It introduces one sink method.
-      
+
     6. A function declaration at function scope is called a local function declaration. It introduces a local function.
 
 5. The `init` introducer and the `deinit` introducer may only appear in a function declaration at type scope.
@@ -1328,7 +1328,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     1. `sink` parameters are immutable and escapable; and
 
     2. `inout` parameters are mutable and escapable, and they must be alive at the end of every terminating execution path; and
-    
+
     3. `assign` parameters are dead and mutable, and they must be alive at the end of every terminating execution path.
 
 4. The output type of a function implementation is the output type of the containing function declaration, unless it is an explicit `inout` method implementation (see Method implementations). A function implementation must have a return statement on every terminating execution path, unless the output type of the containing declaration is `()`. In that case, explicit return statements may be omitted. A function implementation must return an escapable object whose type is a subtype of the output type of the containing method declaration.
@@ -1402,7 +1402,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     method-impl ::=
       method-introducer brace-stmt?
-    
+
     method-introducer ::=
       'let'
       'sink'
@@ -1414,7 +1414,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 3. The parameters declared in the signature of the method declaration containing a method implementation define the parameters of that implementation. An additional implicit parameter, called the receiver parameter, and named `self`, represents the method receiver.
 
 4. In an explicit method implementation, the passing convention of the receiver parameter corresponds to the kind of the method implementation: it is `let` in a `let` implementation; it is `sink` in a `sink` implementation; it is `inout` in a `inout` implementation. In an implicit method implementation, the passing convention of the receiver parameter is defined by the receiver modifier of the containing method declaration.
- 
+
 5. The output type of an explicit `inout` method implementation is `()`.
 
 ## Subscript declarations
@@ -1426,7 +1426,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     subscript-decl ::=
       subscript-head subscript-signature subscript-body
-    
+
     subscript-head ::=
       member-modifier* subscript-ident? generic-clause? capture-list?
 
@@ -1453,11 +1453,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 3. A subscript declaration may be defined at module scope, namespace scope, type scope, or function scope.
 
     1. A subscript declaration at module scope or namespace scope introduces a global subscript declaration. It introduces a global subscript.
-      
+
     2. A subscript declaration at type scope that contains a `static` modifier is called a static subscript declaration; it is also a global subscript declaration. A static member subscript declaration introduces a global susbcript.
 
     3. A subscript declaration at type scope that does not contain a `static` modifier is called a member subscript declaration. It introduces a member subscript. A member subscript declaration may not have a receiver modifier.
-      
+
     4. A subscript declaration at function scope is a local subscript declaration. It introduces a local subscript.
 
 4. A member subscript declaration or a static member subscript declaration without an identifier is called a nameless subscript declaration. It introduces a nameless subscript. A nameless subscript declaration must have an explicit parameter list.
@@ -1497,7 +1497,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     subscript-impl ::=
       subscript-introducer brace-stmt?
-    
+
     subscript-introducer ::=
       'let'
       'sink'
@@ -1516,7 +1516,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     1. `sink` parameters are immutable and escapable.
 
     2. `inout` parameters are mutable and escapable. They must be alive at the end of every terminating execution path.
-    
+
     3. `assign` parameters are dead and mutable. They must be alive at the end of every terminating execution path.
 
 6.  A `let` subscript implementation or an `inout` subscript implementation must have exactly one a yield statement on every terminating execution path. Given a subscript declaration with an output type `A`, a `let` subscript implementation must yield an immutable projection of an object whose type is subtype of `A`, unless the output signature of the subscript declaration is prefixed by `var`. In that case it must yield an mutable projection of an object of type `A`. An `inout` subscript implementation must yield a mutable projection of an object of type `A`.
@@ -1533,7 +1533,7 @@ let+assign = inout
     ```ebnf
     param-list ::=
       param-decl (',' param-decl)?
-      
+
     param-decl ::=
       (IDENT | '_') IDENT? (':' param-type-expr)? default-value?
 
@@ -1548,9 +1548,9 @@ let+assign = inout
     1. A parameter declared without any explicit convention is called a `let` parameter.
 
     2. A parameter declared with the `sink` convention is called a `sink` parameter.
-    
+
     3. A parameter declared with the `inout` convention is called an `inout` parameter.
-    
+
     4. A parameter declared with the `assign` convention is called an `assign` parameter.
 
 3. A `let` parameter of a `sink` parameter may have a default value.
@@ -1655,7 +1655,7 @@ let+assign = inout
     ```ebnf
     while-stmt ::=
       'while' while-condition-list brace-stmt
-    
+
     while-condition-list ::=
       while-condition-item (',' while-condition)*
 
@@ -1868,7 +1868,7 @@ let+assign = inout
     ```ebnf
     buffer-literal ::=
       '[' buffer-component-list? ']'
-    
+
     buffer-component-list ::=
       expr (',' expr)* ','?
     ```
@@ -1893,10 +1893,10 @@ let+assign = inout
     map-literal ::=
       '[' map-literal-component-list ']'
       '[' ':' ']'
-    
+
     map-component-list ::=
       map-component (',' map-component)* ','?
-  
+
     map-component ::=
       expr ':' expr
     ```
@@ -1931,7 +1931,7 @@ let+assign = inout
     ```ebnf
     ident-expr ::=
       entity-ident impl-ident?
-    
+
     entity-ident ::=
       IDENT
       fun-entity-ident
