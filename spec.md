@@ -20,9 +20,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. Comments are treated as though they are a single space `U+20`.
     
-    2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. Spaces are recognized as `U+9` and/or `U+20`.
+    2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+9` and/or `U+20` are recognized as spaces.
 
-    3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. New-line delimiters are recognized as `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A`.
+    3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A` are recognized as new-line delimiters.
 
 
 ## Comments
@@ -147,7 +147,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The significand of a decimal floating-point literal the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. The significand of a hexadecimal floating-point literal is the __hexadecimal-fractional-constant__ or the __hexadecimal-literal__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10 for a decimal floating-point literal and 16 for a hexadecimal floating-point literal, ignoring all occurrences of `_`. If __exponent__ or __binary-exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e` for a decimal floating-point literal and `s × 2e` for a hexadecimal floating-point literal.
 
-3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the scaled value if representable, else the larger or smaller representable value nearest the scaled value, chosen in an implementation-defined manner.
+3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
 #### Character literals
 
@@ -254,10 +254,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     bq-char ::= (any character except `, U+A, and U+D)
 
     contextual-keyword ::= (one of)
-      mutating size some
+      mutating size any
     ```
 
-2. Contextual keywords are identifiers that have a special meaning when appearing in a certain context. When referred to in the grammar, these identifiers are used explicitly rather than using the identifier grammar production. Unless otherwise specified, any ambiguity as to whether a given identifier has a special meaning is resolved to interpret the token as a regular identifier.
+2. Contextual keywords are identifiers that have a special meaning when appearing in a certain context. When referred to in the grammar, these identifiers are used explicitly rather than using the identifier grammar production.
 
 ### Raw operators
 
@@ -268,15 +268,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```
 
     [Note: The Unicode category Sm includes +, =, <, >, |, and ~.]
-
-### Punctuators
-
-1. Punctuators have the form:
-
-    ```ebnf
-    punctuator ::= (any of)
-      . , ; ( ) [ ] { } : ::
-    ```
 
 # General concepts
 
@@ -661,7 +652,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ## Subtyping relation
 
-1. The types form a lattice, partially ordered by a subtyping relation `<:`, for which the least upper bound is `Any` and the greatest lower bound is `Never`.
+1. The types form a lattice, partially ordered by a subtyping relation `<:`, for which the least (and only) upper bound is `Any` and the greatest (and only) lower bound is `Never`.
 
 2. If a type `A1` is equivalent to a type `A2`, then `A1 <: A2`.
     
@@ -702,6 +693,12 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 ## Generic types
 
 # Declarations
+
+## General
+
+1. A declaration may introduce one or more entities.
+
+2. A declaration may be composed other declarations, called sub-declarations. The entities of introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
 ## Modifiers
 
@@ -1169,7 +1166,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. A binding declaration at module scope or namespace scope is called a global binding declaration. It introduces one or more global bindings. A global binding declaration must be introduced with `let`.
       
-    2. A binding declaration at type scope is called a static member binding declaration if it contains a `static` modifier. Otherwise, it is called a member binding declaration. A static member binding declaration introduces one or more global bindings. A member binding declaration introduces one or more member bindingss.
+    2. A binding declaration at type scope is called a static member binding declaration if it contains a `static` modifier. Otherwise, it is called a member binding declaration. A static member binding declaration introduces one or more global bindings. A member binding declaration introduces one or more member bindings.
       
     3. A binding declaration at function scope is called a local binding declaration. It introduces one or more local bindings.
 
