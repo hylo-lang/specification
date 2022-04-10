@@ -841,7 +841,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. Trait declarations have the form:
 
-    ```val
+    ```ebnf
     trait-decl ::=
       trait-head trait-body
 
