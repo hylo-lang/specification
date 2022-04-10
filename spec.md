@@ -20,7 +20,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. Comments are treated as though they are a single space `U+20`.
     
-    2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+9` and/or `U+20` are recognized as spaces.
+    2. Spaces are never part of a token unless they appear between the opening and closing delimiters of a character or string literal. `U+9` and/or `U+20` are recognized as spaces.
 
     3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A` are recognized as new-line delimiters.
 
@@ -31,7 +31,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The character sequences `/*` and `*/` are multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest, and need not contain any new-line characters.
 
-3. The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.
 
 ## Tokens
 
@@ -147,7 +146,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The significand of a decimal floating-point literal the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. The significand of a hexadecimal floating-point literal is the __hexadecimal-fractional-constant__ or the __hexadecimal-literal__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10 for a decimal floating-point literal and 16 for a hexadecimal floating-point literal, ignoring all occurrences of `_`. If __exponent__ or __binary-exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e` for a decimal floating-point literal and `s × 2e` for a hexadecimal floating-point literal.
 
-3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
+3. The default inferred type of an floating point literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
 #### Character literals
 
@@ -698,7 +697,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A declaration may introduce one or more entities.
 
-2. A declaration may be composed other declarations, called sub-declarations. The entities of introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
+2. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
 ## Modifiers
 
@@ -1578,6 +1577,7 @@ let+assign = inout
       brace-stmt
       loop-stmt
       jump-stmt
+      cond-binding-stmt
       decl
       expr
     ```
@@ -1798,6 +1798,24 @@ let+assign = inout
 ### Continue statements
 
 1. Continue statements skip the remainder of a loop body. Control is transferred to the begin of the loop.
+
+## Conditional binding statements
+
+1. Conditional binding statements have the form:
+
+    ```ebnf
+    cond-binding-stmt ::=
+      cond-binding-decl '??' cond-binding-failure
+
+    cond-binding-decl ::=
+      binding-head binding-type-annotation?
+ 
+     cond-binding-failure ::=
+       jump-stmt
+       expr
+    ```
+
+2. If __cond-binding-failure__ is an expression, it must have type `Never`.
 
 # Value expressions
 
