@@ -1061,10 +1061,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       access-modifier? 'extension' type-expr where-clause?
 
     extension-body ::=
-      '{' extension-member-decl-list? '}'
-
-    extension-member-decl-list
-      extension-member-decl (';'* extension-member-decl)+ ';'*
+      '{' (extension-member-decl | ';')* '}'
 
     extension-member-decl ::=
       function-decl
@@ -1093,10 +1090,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       access-modifier? 'conformance' type-expr ':' conformance-list where-clause?
 
     conformance-body ::=
-      '{' conformance-member-decl-list? '}'
-
-    conformance-member-decl-list
-      conformance-member-decl (';'* conformance-member-decl)+ ';'*
+      '{' (conformance-member-decl | ';')* '}'
 
     conformance-member-decl ::=
       function-decl
