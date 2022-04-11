@@ -1259,7 +1259,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       'init'
       'deinit'
       'fun' identifier
-      oper-notation 'fun' OPER
+      oper-notation 'fun' operator
 
     function-body ::=
       function-bundle-body
@@ -1267,6 +1267,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     function-bundle-body ::=
       '{' method-impl+ '}'
+
+    operator ::= (token)
+      raw-operator+
     ```
 
 2. (Example)
@@ -1431,7 +1434,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     subscript-ident ::=
       'subscript' identifier
-      oper-notation 'subscript' OPER
+      oper-notation 'subscript' operator
 
     subscript-body ::=
       brace-stmt
@@ -1931,7 +1934,7 @@ let+assign = inout
     entity-ident ::=
       identifier
       function-entity-ident
-      oper-notation OPER
+      oper-notation operator
 
     function-entity-ident ::=
       identifier '(' argument-label+ ')'
