@@ -1127,7 +1127,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     binding-head ::=
       access-modifier? member-modifier* binding-introducer pattern
 
-    binding-introducer ::=
+    binding-introducer ::= 
       'let'
       'var'
       'sink let'
@@ -1249,7 +1249,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     function-decl ::=
-      'default init'
+      'default' 'init'
       function-head function-signature function-body?
 
     function-head ::=
@@ -1258,7 +1258,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     function-ident ::=
       'init'
       'deinit'
-      'fun' IDENT
+      'fun' identifier
       oper-notation 'fun' OPER
 
     function-body ::=
@@ -1430,7 +1430,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       member-modifier* subscript-ident? generic-clause? capture-list?
 
     subscript-ident ::=
-      'subscript' IDENT
+      'subscript' identifier
       oper-notation 'subscript' OPER
 
     subscript-body ::=
@@ -1534,7 +1534,7 @@ let+assign = inout
       param-decl (',' param-decl)?
 
     param-decl ::=
-      (IDENT | '_') IDENT? (':' param-type-expr)? default-value?
+      (identifier | '_') identifier? (':' param-type-expr)? default-value?
 
     default-value ::=
       '=' expr
@@ -1929,15 +1929,15 @@ let+assign = inout
       entity-ident impl-ident?
 
     entity-ident ::=
-      IDENT
+      identifier
       function-entity-ident
       oper-notation OPER
 
     function-entity-ident ::=
-      IDENT '(' argument-label+ ')'
+      identifier '(' argument-label+ ')'
 
     argument-label ::=
-      (IDENT | '_') ':'
+      (identifier | '_') ':'
 
     impl-ident ::=
       '.' method-introducer
@@ -2015,7 +2015,7 @@ let+assign = inout
       call-argument ( ',' call-argument )*
 
     call-argument :=
-      (IDENT ':')? expr
+      (identifier ':')? expr
     ```
 
     The opening parenthesis preceding the call argument list must be on the same line as the callee.
