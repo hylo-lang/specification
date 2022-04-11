@@ -711,7 +711,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     access-modifier ::=
-      public
+      'public'
     ```
 
 2. A declaration is *private* if it does not have any access modifier. A private declaration *exposes* the names that it introduces to the innermost scope that contains it. The static and non-static members introduced in the lexical scope of a type declaration are additionally exposed to the lexical scopes of the conformance declarations of the declared type.
@@ -749,10 +749,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       receiver-modifier
       static-modifier
 
-    receiver-modifier ::=
-      'sink'
-      'inout'
-      'out'
+    receiver-modifier ::= (one of)
+      sink inout out
 
     static-modifier ::=
       'static'
@@ -772,7 +770,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     conformance-list ::=
-      ':' type-identifier (',' type-identifier)
+      ':' type-identifier (',' type-identifier)*
     ```
 
 ## Generic clauses
@@ -849,13 +847,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       access-modifier? 'trait' identifier trait-refinement-list
 
     trait-refinement-list ::=
-      ':' type-name (',' type-name)
+      ':' type-name (',' type-name)*
 
     trait-body ::=
-      '{' trait-requirement-decl-list? '}'
+      '{' trait-requirement-decl-list '}'
 
     trait-requirement-decl-list ::=
-      trait-requirement-decl (';'* trait-requirement-decl)+ ';'*
+      (trait-requirement-decl | ';')*
 
     trait-requirement-decl ::=
       associated-type-decl
@@ -1031,10 +1029,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       access-modifier? identifier generic-clause? conformance-list
 
     product-type-body ::=
-      '{' product-type-member-decl-list? '}'
+      '{' product-type-member-decl-list '}'
 
-    product-type-member-decl-list
-      product-type-member-decl (';'* product-type-member-decl)+ ';'*
+    product-type-member-decl-list ::=
+      (product-type-member-decl | ';')*
 
     product-type-member-decl ::=
       function-decl
