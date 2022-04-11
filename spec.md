@@ -20,9 +20,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. Comments are treated as though they are a single space `U+20`.
 
-    2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+9` and/or `U+20` are recognized as spaces.
+    2. Spaces are ignored unless they appear between the opening and closing delimiters of a character or string literal. Unicode characters with the "White_Space" property are recognized as spaces.
 
-    3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. `U+A`, and/or `U+D`, and/or the `U+D` directly followed by `U+A` are recognized as new-line delimiters.
+    3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. Unicode characters with the "Line_Break" property are recognized as new-line delimiters.
 
 
 ## Comments
@@ -115,7 +115,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     floating-point-literal ::=
       decimal-floating-point-literal
-      hexadecimal-floating-point-literal
 
     decimal-floating-point-literal ::= (token)
       decimal-fractional-constant exponent?
@@ -128,22 +127,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       'e' exponent-sign? decimal-literal
       'E' exponent-sign? decimal-literal
 
-    hexadecimal-floating-point-literal ::= (token)
-      hexadecimal-fractional-constant binary-exponent?
-      hexadecimal-literal binary-exponent
-
-    hexadecimal-fractional-constant ::= (token)
-      hexadecimal-literal '.' hexadecimal-literal
-
-    binary-exponent := (token)
-      'p' exponent-sign? decimal-literal
-      'P' exponent-sign? decimal-literal
-
     exponent-sign ::= (one of)
       + -
     ```
 
-2. The significand of a decimal floating-point literal the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. The significand of a hexadecimal floating-point literal is the __hexadecimal-fractional-constant__ or the __hexadecimal-literal__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10 for a decimal floating-point literal and 16 for a hexadecimal floating-point literal, ignoring all occurrences of `_`. If __exponent__ or __binary-exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e` for a decimal floating-point literal and `s × 2e` for a hexadecimal floating-point literal.
+2. The significand of a floating-point literal is the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10, ignoring all occurrences of `_`. If __exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e`.
 
 3. The default inferred type of an integer literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
@@ -850,10 +838,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       ':' type-name (',' type-name)*
 
     trait-body ::=
-      '{' trait-requirement-decl-list '}'
-
-    trait-requirement-decl-list ::=
-      (trait-requirement-decl | ';')*
+      '{' (trait-requirement-decl | ';')* '}'
 
     trait-requirement-decl ::=
       associated-type-decl
@@ -910,9 +895,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines a one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
 
-2. When a method requirement declaration has a __fun-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines denotes a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
+2. When a method requirement declaration has a __function-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines denotes a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
 
-3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __fun-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
+3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __function-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
 
 4. (Example)
 
@@ -1073,7 +1058,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       extension-head extension-body
 
     extension-head ::=
-      'extension' type-expr where-clause?
+      access-modifier? 'extension' type-expr where-clause?
 
     extension-body ::=
       '{' extension-member-decl-list? '}'
@@ -1088,7 +1073,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       type-alias-decl
     ```
 
-2. When a subscript or method `e` is defined in an extension declaration, the constraints of the __where-clause__ of that declarations are called the conditions of `e`.
+2. An extension declaration may not appear in the lexical scope of a conformance or extension declaration.
+
+3. A `public` access modifier may only appear in extension declarations defined in the lexical scope of a module. An public extension declaration exposes its public members outside of the module in which it is declared.
+
+4. When a subscript or method `e` is defined in an extension declaration, the constraints of the __where-clause__ of that declarations are called the conditions of `e`.
 
 ## Conformance declarations
 
@@ -1101,7 +1090,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       conformance-head conformance-body
 
     conformance-head ::=
-      access-modifier? 'conformance' type-expr ':' trait-composition where-clause?
+      access-modifier? 'conformance' type-expr ':' conformance-list where-clause?
 
     conformance-body ::=
       '{' conformance-member-decl-list? '}'
@@ -1114,6 +1103,21 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       subscript-decl
       product-type-decl
       type-alias-decl
+    ```
+
+2. A conformance declaration may not appear in the lexical scope of a conformance or extension declaration.
+
+3. A `public` access modifier may only appear in conformance declarations defined in the lexical scope of a module. An public conformance declaration exposes new conformances outside of the module in which it is declared.
+
+4. (Example)
+
+    ```val
+    // In 'MyModule.module.val'
+    public namespace Foo {
+      public trait T {}
+      public conformance Int: T {} // error
+    }
+    public conformance String: T {} // OK: `String` conforms to `T` in importing modules.
     ```
 
 ## Binding declarations
@@ -1250,24 +1254,24 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. Function declarations have the form:
 
     ```ebnf
-    fun-decl ::=
+    function-decl ::=
       'default init'
-      fun-head fun-signature fun-body?
+      function-head function-signature function-body?
 
-    fun-head ::=
-      access-modifier? member-modifier* fun-ident generic-clause? capture-list?
+    function-head ::=
+      access-modifier? member-modifier* function-ident generic-clause? capture-list?
 
-    fun-ident ::=
+    function-ident ::=
       'init'
       'deinit'
       'fun' IDENT
       oper-notation 'fun' OPER
 
-    fun-body ::=
-      fun-bundle-body
+    function-body ::=
+      function-bundle-body
       brace-stmt
 
-    fun-bundle-body ::=
+    function-bundle-body ::=
       '{' method-impl+ '}'
     ```
 
@@ -1310,7 +1314,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 1. Function signatures have the form:
 
     ```ebnf
-    fun-signature ::=
+    function-signature ::=
       '(' param-list? ')' ('->' type-expr)?
     ```
 
@@ -1595,10 +1599,7 @@ let+assign = inout
 
     ```ebnf
     brace-stmt ::=
-      '{' stmt-list? '}'
-
-    stmt-list ::=
-      stmt (';'* stmt)+ ';'*
+      '{' (stmt | ';')* '}'
     ```
 
 3. The statements contained in a brace statements are called its sub-statements.
@@ -1935,10 +1936,10 @@ let+assign = inout
 
     entity-ident ::=
       IDENT
-      fun-entity-ident
+      function-entity-ident
       oper-notation OPER
 
-    fun-entity-ident ::=
+    function-entity-ident ::=
       IDENT '(' argument-label+ ')'
 
     argument-label ::=
