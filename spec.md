@@ -1021,10 +1021,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       access-modifier? identifier generic-clause? conformance-list
 
     product-type-body ::=
-      '{' product-type-member-decl-list '}'
-
-    product-type-member-decl-list ::=
-      (product-type-member-decl | ';')*
+      '{' (product-type-member-decl | ';')* '}'
 
     product-type-member-decl ::=
       function-decl
