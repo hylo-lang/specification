@@ -856,28 +856,35 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. A trait declaration may only appear at global scope. It introduces __identifier__ as a name denoting the declared trait.
 
-5. The associated type, function, and subscript declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
+5. The associated type, associated size, function, and subscript declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
 
-### Associated type requirements
+### Associated type and size requirements
 
-1. An associated type declaration defines an *associated type requirement*. As associated type is a placeholder for a type that relates to the trait and must be specified by conforming types. Associated type declarations have the form:
+1. An associated type declaration defines an *associated type requirement*. An associated size declaration defines an *associated size requirement*. An associated type or size is a placeholder for a type or size that relates to the trait and must be specified by conforming types. Associated type and size declarations have the form:
 
     ```ebnf
+    associated-decl ::=
+      associated-type-decl
+      associated-size-decl
+    
     associated-type-decl ::=
-      associated-type-head associated-type-constraints? associated-type-default?
+      associated-type-head associated-type-constraints? ('=' type-expr)?
 
     associated-type-head ::=
-      static-modifier? identifier
+      'type' identifier
 
     associated-type-constraints ::=
       conformance-list
       conformance-list? where-clause
 
-    associated-type-default ::=
-      '=' type-expr
+    associated-size-decl ::=
+      associated-size-head where-clause? ('=' expr)?
+
+    associated-size-head ::=
+      'size' identifier
     ```
 
-2. The type constraints of an associated type declaration impose constraints on the types that may satisfy an associated type requirement.
+2. The constraints of an associated type or size declaration impose constraints on the types that may satisfy an associated type or size requirement.
 
 3. (Example)
 
