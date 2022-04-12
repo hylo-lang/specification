@@ -774,7 +774,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       generic-size-param
 
     generic-type-param ::=
-      identifier '...'? trait-annotation?
+      generic-type-param-identifier trait-annotation?
+
+    generic-type-param-identifier ::= (token)
+      identifier '...'?
 
     trait-annotation ::=
       ':' trait-composition
