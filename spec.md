@@ -1655,7 +1655,7 @@ let+assign = inout
       'while' while-condition-list brace-stmt
 
     while-condition-list ::=
-      while-condition-item (',' while-condition)*
+      while-condition-item (',' while-condition-item)*
 
     while-condition-item ::=
       binding-decl
