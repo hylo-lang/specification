@@ -1130,8 +1130,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     binding-introducer ::= 
       'let'
       'var'
-      'sink let'
-      'sink var'
+      'sink' 'let'
+      'sink' 'var'
       'inout'
 
     binding-type-annotation ::=
@@ -1405,10 +1405,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     method-impl ::=
       method-introducer brace-stmt?
 
-    method-introducer ::=
-      'let'
-      'sink'
-      'inout'
+    method-introducer ::= (one of)
+      let sink inout
     ```
 
 2. An explicit method implementation introduced with `let` is called a `let` method implementation; one introduced with `sink` is called a `sink` method implementation; one introduced with `inout` is called an `inout` method implementation.
@@ -1500,11 +1498,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     subscript-impl ::=
       subscript-introducer brace-stmt?
 
-    subscript-introducer ::=
-      'let'
-      'sink'
-      'inout'
-      'assign'
+    subscript-introducer ::= (one of)
+      let sink inout assign
     ```
 
 2. Am explicit subscript implementation introduced with `let` is called a `let` subscript implementation; one introduced with `sink` is called a `sink` subscript implementation; one introduced with `inout` is called an `inout` subscript implementation; one introduced with `assign` is called an `assign` subscript implementation.
@@ -1840,10 +1835,10 @@ let+assign = inout
 
     ```ebnf
     scalar-literal ::=
-      BOOL-LITERAL
-      INT-LITERAL
-      FLOAT-LITERAL
-      STRING-LITERAL
+      boolean-literal
+      integer-literal
+      floating-point-literal
+      string-literal
     ```
 
 ### Compound literals
@@ -2042,10 +2037,8 @@ let+assign = inout
 1. Operator notations have the form:
 
     ```ebnf
-    oper-notation ::=
-      'infix'
-      'prefix'
-      'postfix'
+    oper-notation ::= (one of)
+      infix prefix postfix
     ```
 
 # Type expressions
