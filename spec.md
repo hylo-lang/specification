@@ -1602,7 +1602,7 @@ let+assign = inout
 
 4. Control enters the lexical scope of a brace statement before executing any sub-statements and exits that lexical scope when it reaches the end of the brace statement.
 
-## Loop statments
+## Loop statements
 
 ### General
 
@@ -1621,7 +1621,7 @@ let+assign = inout
 
 4. A continuation test is a procedure that determines whether an additional iteration should take place, or whether control should exit the loop. A continuation test may take in the head or in the body of a loop.
 
-### Do-while statments
+### Do-while statements
 
 1. `do-while` statements have the form:
 
@@ -1646,7 +1646,7 @@ let+assign = inout
 
 4. The head of a `do-while` statement unconditionally transfers control to the body of the loop. The tail performs a continuation test. If it succeeds, control is transferred back to the head. Otherwise, it exits the loop.
 
-### While statments
+### While statements
 
 1. `while` statements have the form:
 
@@ -1757,13 +1757,13 @@ let+assign = inout
 
 2. `break` and `continue` statements are called loop jump statements. A loop jump statement applies to the innermost loop.
 
-### Return statments
+### Return statements
 
 1. Return statements return an object from a function, terminating the execution path and transferring control back to the function's caller.
 
 2.  The expression in a return statement is called its operand. If the operand is omitted, it is interpreted as `()`. A return statement consumes the value of the operand to initialize an escapable object as result of the call to the containing function.
 
-### Yield statments
+### Yield statements
 
 1. Yield statements project an object out of a subscript, suspending the execution path and temporarily transferring control to the subscript's caller. Control comes back to the subscript once after the last use of the yielded projection at the call site, resuming execution at the statement that directly follows the yield statement.
 
