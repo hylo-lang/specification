@@ -1257,9 +1257,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       function-head function-signature function-body?
 
     function-head ::=
-      access-modifier? member-modifier* function-ident generic-clause? capture-list?
+      access-modifier? member-modifier* function-identifier generic-clause? capture-list?
 
-    function-ident ::=
+    function-identifier ::=
       'init'
       'deinit'
       'fun' identifier
@@ -1432,9 +1432,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       subscript-head subscript-signature subscript-body
 
     subscript-head ::=
-      member-modifier* subscript-ident? generic-clause? capture-list?
+      member-modifier* subscript-identifier? generic-clause? capture-list?
 
-    subscript-ident ::=
+    subscript-identifier ::=
       'subscript' identifier
       oper-notation 'subscript' operator
 
