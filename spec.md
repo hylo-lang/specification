@@ -270,7 +270,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let`. are method names.
 
-4. An __ident-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of the all the uses of its sub-expressions.
+4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of the all the uses of its sub-expressions.
 
 5. A *binding* is a name that denotes an object or a projection. The value of a binding is the denoted object or the value of the denoted projection. The value of a binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has been consumed. A mutable binding can be *resurrected* by consuming an object; an immutable binding cannot.
 
@@ -1263,7 +1263,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       'init'
       'deinit'
       'fun' identifier
-      oper-notation 'fun' operator
+      operator-notation 'fun' operator
 
     function-body ::=
       function-bundle-body
@@ -1436,7 +1436,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     subscript-identifier ::=
       'subscript' identifier
-      oper-notation 'subscript' operator
+      operator-notation 'subscript' operator
 
     subscript-body ::=
       brace-stmt
@@ -1935,7 +1935,7 @@ let+assign = inout
 
     ```ebnf
     primary-decl-ref ::=
-      ident-expr type-argument-list?
+      identifier-expr type-argument-list?
     ```
 
 ### Identifiers
@@ -1943,21 +1943,24 @@ let+assign = inout
 1. Identifiers have the form:
 
     ```ebnf
-    ident-expr ::=
-      entity-ident impl-ident?
+    identifier-expr ::=
+      entity-identifier impl-identifier?
 
-    entity-ident ::=
+    entity-identifier ::=
       identifier
-      function-entity-ident
-      oper-notation operator
+      function-entity-identifier
+      operator-entity-identifier
 
-    function-entity-ident ::=
+    function-entity-identifier ::= (token)
       identifier '(' argument-label+ ')'
 
-    argument-label ::=
+    operator-entity-identifier ::= (token)
+      operator-notation operator
+
+    argument-label ::= (token)
       (identifier | '_') ':'
 
-    impl-ident ::=
+    impl-identifier ::= (token)
       '.' method-introducer
     ```
 
@@ -2057,7 +2060,7 @@ let+assign = inout
 1. Operator notations have the form:
 
     ```ebnf
-    oper-notation ::= (one of)
+    operator-notation ::= (one of)
       infix prefix postfix
     ```
 
