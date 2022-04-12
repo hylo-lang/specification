@@ -1749,6 +1749,7 @@ let+assign = inout
 
     ```ebnf
     jump-stmt ::=
+      cond-binding-stmt
       'return' expr?
       'yield' expr
       'break'
@@ -1756,6 +1757,21 @@ let+assign = inout
     ```
 
 2. `break` and `continue` statements are called loop jump statements. A loop jump statement applies to the innermost loop.
+
+### Conditional binding statements
+
+1. Conditional binding statements have the form:
+
+    ```ebnf
+    cond-binding-stmt ::=
+      binding-head binding-type-annotation? '??' cond-binding-body
+
+    cond-binding-body ::=
+      jump-stmt
+      expr
+    ```
+
+2. If the body of a conditional binding statement is an expression, it must have type `Never`.
 
 ### Return statements
 
