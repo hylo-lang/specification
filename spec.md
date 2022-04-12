@@ -767,22 +767,22 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     generic-clause ::=
-      '<' generic-param (',' generic-param)* where-clause? '>'
+      '<' generic-parameter (',' generic-parameter)* where-clause? '>'
 
-    generic-param ::=
-      generic-type-param
-      generic-size-param
+    generic-parameter ::=
+      generic-type-parameter
+      generic-size-parameter
 
-    generic-type-param ::=
-      generic-type-param-identifier trait-annotation?
+    generic-type-parameter ::=
+      generic-type-parameter-identifier trait-annotation?
 
-    generic-type-param-identifier ::= (token)
+    generic-type-parameter-identifier ::= (token)
       identifier '...'?
 
     trait-annotation ::=
       ':' trait-composition
 
-    generic-size-param ::=
+    generic-size-parameter ::=
       identifier ':' 'size'
     ```
 
@@ -1319,7 +1319,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     function-signature ::=
-      '(' param-list? ')' ('->' type-expr)?
+      '(' parameter-list? ')' ('->' type-expr)?
     ```
 
 2. The default value of a parameter declaration may not refer to another parameter in a function signature.
@@ -1487,10 +1487,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     subscript-signature ::=
-      explicit-subscript-param-list? ':' 'var'? type-expr
+      explicit-subscript-parameter-list? ':' 'var'? type-expr
 
-    explicit-subscript-param-list ::=
-      '(' param-list? ')'
+    explicit-subscript-parameter-list ::=
+      '(' parameter-list? ')'
     ```
 
 2. The default value of a parameter declaration may not refer to another parameter in a subscript signature.
@@ -1535,11 +1535,11 @@ let+assign = inout
 1. Parameter declarations have the form:
 
     ```ebnf
-    param-list ::=
-      param-decl (',' param-decl)?
+    parameter-list ::=
+      parameter-decl (',' parameter-decl)?
 
-    param-decl ::=
-      (identifier | '_') identifier? (':' param-type-expr)? default-value?
+    parameter-decl ::=
+      (identifier | '_') identifier? (':' parameter-type-expr)? default-value?
 
     default-value ::=
       '=' expr
