@@ -220,8 +220,8 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```ebnf
     keyword ::= (one of)
       Any Never as as! _as!! async await break catch conformance continue deinit else extension
-      false for fun if import in infix init let match namespace nil postfix prefix private public
-      return sink static true try type typealias var where while yield
+      false for fun if import in infix init let match namespace nil postfix prefix public return
+      sink static true try type typealias var where while yield
     ```
 
 ### Identifiers
