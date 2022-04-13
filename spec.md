@@ -443,7 +443,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. `o1` is a sub-object of `o2`; or
 
-    2. there exists an object `o3` such that `o1` is nested within `o3` and `o3` is nested within `o1`.
+    2. there exists an object `o3` such that `o1` is nested within `o3` and `o3` is nested within `o2`.
 
 6. For every object `o`, there exists a single root object `o`, determined as follows:
 
@@ -547,7 +547,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     2. a sub-object of `o1` projects `o2`.
 
-3. When an object `o1` projects an object `o2`, `o2` is said to be projected by o1`. [Note: Copying creates a new object that is not a projection.]
+3. When an object `o1` projects an object `o2`, `o2` is said to be projected by `o1`. [Note: Copying creates a new object that is not a projection.]
 
 4. (Example)
 
@@ -663,11 +663,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     1. the function type of `A1` is subtype of the function type of `A2`; and
 
-    2. the environment of `A1` and `A2` are both equivalent or the environnment of `A2` is erased.
+    2. the environment of `A1` and `A2` are both equivalent or the environment of `A2` is erased.
 
 7. If `A1`and `A2` are existential types, `A1 <: A2` if the traits of `A2` are coarser than the traits of `A1` and the associated types of `A1` are equivalent to the associated types of `A2`.
 
-8. If `A1` and `A2` are bound generic types, `A1 <: A2` if each type arguments of `A1` is equivalent to corresponding type argument of `A2`.
+8. If `A1` and `A2` are bound generic types, `A1 <: A2` if each type argument of `A1` is equivalent to the corresponding type argument of `A2`.
 
 9.  (Example)
 
@@ -689,7 +689,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A declaration may introduce one or more entities.
 
-2. A declaration may be composed other declarations, called sub-declarations. The entities of introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
+2. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
 ## Modifiers
 
@@ -704,7 +704,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. A declaration is *private* if it does not have any access modifier. A private declaration *exposes* the names that it introduces to the innermost scope that contains it. The static and non-static members introduced in the lexical scope of a type declaration are additionally exposed to the lexical scopes of the conformance declarations of the declared type.
 
-3. A declaration is *public* if it has a `public` access modifier. A public declaration exposes the names it introduces the parent scope of the innermost scope that contains it. A public declaration that appears in the lexical scope of a module is *external*.
+3. A declaration is *public* if it has a `public` access modifier. A public declaration exposes the names it introduces to the parent scope of the innermost scope that contains it. A public declaration that appears in the lexical scope of a module is *external*.
 
 4. (Example)
 
@@ -746,7 +746,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. A member modifier may appear at most once in a declaration.
 
-3. The `static` may only apply to a binding declaration, a function declaration, or a subscript declaration at type scope.
+3. The `static` modifier may only apply to a binding declaration, a function declaration, or a subscript declaration at type scope.
 
 4. A receiver modifier may only appear in a function declaration or a subscript declaration at type scope.
 
@@ -786,7 +786,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       identifier ':' 'size'
     ```
 
-2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it as been written in the where clause.
+2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it has been written in the where clause.
 
 3. (Example)
 
@@ -903,7 +903,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Method requirements
 
-1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines a one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
+1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
 
 2. When a method requirement declaration has a __function-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines denotes a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
 
@@ -939,7 +939,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Subscript requirements
 
-1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement declaration* that defines a one or more *subscript requirements*. A subscript requirement is the specification of a subscript that must be implemented in conforming types.
+1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement declaration* that defines one or more *subscript requirements*. A subscript requirement is the specification of a subscript that must be implemented in conforming types.
 
 2. A subscript requirement declaration must have a __subscript-bundle-body__. Each subscript implementation in that body denotes a subscript requirement.
 
@@ -961,7 +961,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Trait conformance
 
-1. A type `A` *conforms* a trait `T1` in a lexical scope if a conformance of `A` to `T1` is exposed to that scope and if `T1` and satisfies all the requirements of `T1`, or if `A` conforms to a trait `T2` such that `T2` refines `T1`.
+1. A type `A` *conforms to* a trait `T1` in a lexical scope if a conformance of `A` to `T1` is exposed to that scope and if `T1` and satisfies all the requirements of `T1`, or if `A` conforms to a trait `T2` such that `T2` refines `T1`.
 
 2. (Example)
 
@@ -1156,7 +1156,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     This binding declaration defines two new immutable bindings: `name` and `age`.
 
-3. A binding declaration defines a new binding for each name pattern in pattern. All new bindings are defined with the same capabilities.
+3. A binding declaration defines a new binding for each name pattern in *pattern*. All new bindings are defined with the same capabilities.
 
     1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
@@ -1164,7 +1164,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     3. A binding declaration introduced with `sink` defines an escapable binding. An escapable binding may only be assigned to sinkable objects. The value of an escapable binding may be consumed at a given program point if is escapable at that program point.
 
-  A mutable binding can appear on the left side of an assignment, on the right side of an assignment to a non-escapable mutable binding, as the initializer of non-escapable mutable binding, as argument to an `inout` parameter, or as argument to an `assign` parameter. An escapable binding can appear as the
+  A mutable binding can appear on the left side of an assignment, on the right side of an assignment to a non-escapable mutable binding, as the initializer of non-escapable mutable binding, as argument to an `inout` parameter, or as argument to an `assign` parameter. An escapable binding can appear as the (unfinished sentence).
 
 4. The pattern of a binding declaration may not contain any binding patterns and, unless it appears in the condition of a loop statement or in the condition of a selection expression, it may not contain any expression patterns.
 
@@ -1182,11 +1182,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A static member binding declaration, or global binding declaration must contain an initializer. Initialization occurs at the first dynamic use of one of the declared bindings.
 
-2. A local binding declaration must contain an initializer unless it appears in the condition of a match expression. If the binding declaration is a sub-statement in a brace statement, initialization occurs immediately after declaration. If the binding declaration is a condition in a loop statement or a condition in a selection expression, initialization occurs immediately after the a successful pattern matching.
+2. A local binding declaration must contain an initializer unless it appears in the condition of a match expression. If the binding declaration is a sub-statement in a brace statement, initialization occurs immediately after declaration. If the binding declaration is a condition in a loop statement or a condition in a selection expression, initialization occurs immediately after a successful pattern matching.
 
 3. A member binding declaration may not have an initializer. Initialization occurs in the constructor of the object of which the introduced bindings are members (see Type initialization).
 
-4. The initialization of an escapable binding or a binding whose declaration is introduced with `var` consumes the value of its initializer.
+4. The initialization of an escapable binding, or a binding whose declaration is introduced with `var`, consumes the value of its initializer.
 
 5. The initialization of a non-escapable binding whose declaration is introduced with `let` or `inout` projects the object to which its initializer evaluates. The projection is immutable if the binding is immutable. Otherwise, it is mutable. The projection is for the duration of the binding's lifetime.
 
@@ -1207,7 +1207,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. A binding is said to be alive at a given program point if that program point falls within one of its lifetimes. Otherwise, it is said to be dead.
 
-3. The lifetime of a global binding begins with its initialization is complete and ends when the program terminates.
+3. The lifetime of a global binding begins when its initialization is complete and ends when the program terminates.
 
 4. The lifetime of a member binging `b` begins when the initialization of the object `o` of which it is a sub-object is complete and ends when `o` is consumed, or when `b` is consumed in a `sink` method of `o`.
 
@@ -1246,7 +1246,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-    The lifetime of `thing` ends when `a` is initialized because construction an array literal consumes the literal's elements. A new lifetime starts before `borrow` returns as the call to `Array.remove_last` produces an independent value.
+    The lifetime of `thing` ends when `a` is initialized because construction of an array literal consumes the literal's elements. A new lifetime starts before `borrow` returns as the call to `Array.remove_last` produces an independent value.
 
 ## Function declarations
 
@@ -1307,7 +1307,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 6. A method implementation may only appear in a method declaration.
 
-7. A function declaration of the form 'default init' is an *explicit default constructor* and may only appear in a product type declaration.
+7. A function declaration of the form `default init` is an *explicit default constructor* and may only appear in a product type declaration.
 
 8.  An operator notation specifier defines an operator member function; it may only appear in a function declaration at type scope.
 
@@ -1499,7 +1499,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Subscript implementations
 
-1. A subscript implementation may be defined ikmplicitly or explicitly. Explicit subscript implementations have the form:
+1. A subscript implementation may be defined implicitly or explicitly. Explicit subscript implementations have the form:
 
     ```ebnf
     subscript-impl ::=
@@ -1511,9 +1511,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. Am explicit subscript implementation introduced with `let` is called a `let` subscript implementation; one introduced with `sink` is called a `sink` subscript implementation; one introduced with `inout` is called an `inout` subscript implementation; one introduced with `assign` is called an `assign` subscript implementation.
 
-3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `out` parameter, called the receiver parameter, named `self`, and representing the subscript receiver.
+3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `out` parameter, called the receiver parameter, and named `self`, represents the subscript receiver.
 
-4. The passing convention of an `out` parameter dependends on the kind of the sibscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in an `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `assign` parameter in an `assign` subscript implementation.
+4. The passing convention of an `out` parameter dependends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in an `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `assign` parameter in an `assign` subscript implementation.
 
 5. All parameters of a subscript implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `assign` parameters are alive before the first statement. Further:
 
@@ -1527,6 +1527,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 7. A `sink` subscript implementation must have a return statement on every terminating execution path. It must return an escapable object whose type is subtype of the output type of the containing subscript declaration.
 
+<!-- FIXME: unfinished code block. -->
 let+assign = inout
     ```
 
@@ -1545,9 +1546,9 @@ let+assign = inout
       '=' expr
     ```
 
-1. If the declaration contains two identifiers, the first is used as an argument label and the second is used as a parameter name. Otherwise, the same identifier is used as both an argument label and as a parameter name. If the declaration contains a wildcard followed by an identifier, it defines a positional parameter. The identifier is used as a parameter name.
+2. If a parameter declaration contains two identifiers, the first is used as the argument label and the second is used as the parameter name. Otherwise, the same identifier is used as both the argument label and as the parameter name. If the declaration contains a wildcard followed by an identifier, it defines a positional parameter. The identifier is used as the parameter name.
 
-2. Parameter declarations define the passing convention of the arguments to the declared parameters in a function call:
+3. Parameter declarations define the passing convention of the arguments to the declared parameters in a function call:
 
     1. A parameter declared without any explicit convention is called a `let` parameter.
 
@@ -1557,9 +1558,9 @@ let+assign = inout
 
     4. A parameter declared with the `assign` convention is called an `assign` parameter.
 
-3. A `let` parameter of a `sink` parameter may have a default value.
+4. `let` parameters and `sink` parameters may have a default value.
 
-4. A default value must be a non-consuming expression. A default value to a `sink` parameter must evlauate to an escapable object.
+5. A default value must be a non-consuming expression. A default value to a `sink` parameter must evaluate to an escapable object.
 
 ## Capture lists
 
@@ -1588,7 +1589,7 @@ let+assign = inout
 
 2. Except as indicated, statements are executed in sequence.
 
-3. Statements do not require explicit statement delimiter. Semicolons can be used to separate statements explicitly, for legibility or to disambiguate exceptional situations. [Note: A common practice is to write each statement on a new line.]
+3. Statements do not require an explicit statement delimiter. Semicolons can be used to separate statements explicitly, for legibility or to disambiguate exceptional situations. [Note: A common practice is to write each statement on a new line.]
 
 ## Brace statements (a.k.a. code blocks)
 
@@ -1645,9 +1646,9 @@ let+assign = inout
     } while x < 3
     ```
 
-    The binding `x` that occurring in the condition of the `do-while` statement is declared it its body.
+    The binding `x` that occurrs in the condition of the `do-while` statement is declared in it its body.
 
-4. The head of a `do-while` statement unconditionally transfers control to the body of the loop. The tail performs a continuation test. If it succeeds, control is transferred back to the head. Otherwise, it exits the loop.
+4. The head of a `do-while` statement unconditionally transfers control to the body of the loop. The tail performs a continuation test. If it succeeds, control is transferred back to the head. Otherwise, control exits the loop.
 
 ### While statements
 
@@ -1665,9 +1666,9 @@ let+assign = inout
       expr
     ```
 
-2. The condition of a `while` belongs to the head of the loop. It is a non-empty sequence of condition items. A condition item that is a binding declaration is considered satisfied if and only if the value of the initializer matches the pattern and can initialize its new bindings. A condition item that is an expression must be of type `Bool` and is considierd satisfied if and only if it evaluates to `true`. That value is not consumed. If the condition contains more than a single item, the n+1th item is evaluated if and only if the nth item is satisfied. The continuation test succeeds if and only if all items are satisfied.
+2. The condition of a `while` belongs to the head of the loop. It is a non-empty sequence of condition items. A condition item that is a binding declaration is considered satisfied if and only if the value of the initializer matches the pattern and can initialize its new bindings. A condition item that is an expression must be of type `Bool` and is considered satisfied if and only if it evaluates to `true`. That value is not consumed. If the condition contains more than a single item, the n+1th item is evaluated if and only if the nth item is satisfied. The continuation test succeeds if and only if all items are satisfied.
 
-3. The head of a `while` statement performs a continuation test. If it succeeds, control is transferred to the body of the loop. Otherwise, it exits the loop. The tail unconditionally transfers control back to the head.
+3. The head of a `while` statement performs a continuation test. If it succeeds, control is transferred to the body of the loop. Otherwise, control exits the loop. The tail unconditionally transfers control back to the head.
 
 ### For statements
 
@@ -1709,11 +1710,11 @@ let+assign = inout
     }
     ```
 
-    This program is ill-typed. The range is referring to a binding introduced in the loop binding.
+    This program is ill-typed. The range refers to a binding introduced in the loop binding.
 
 5. The range must be an expression of a type that conforms to the `Iterable` trait. When a `for` statement is executed, an iterator object `it` is produced by calling `make_iterator` on the object evaluated by the loop range. The continuation test consists of verifying that `it.next()` does not result in a `nil` object. The loop iterates over all elements produced by the iterator, unless it is exited early via a break or a return statement.
 
-6. The head of a `for` statement performs a continuation test. If it fails, control exits the loop. Otherwise, it tests whether the latest object projected by the loop's iterator matches the pattern of the binding declaration and can initialize its new bindings. If and only if it does, the loop filter is evaluated. If and only if the filter evaluates to `true`, control enters the body of the loop. The value of the filter is not consumed. If either the pattern of the binding declaration does not match, or the filter is not satisfied, control is transferred back the head.
+6. The head of a `for` statement performs a continuation test. If it fails, control exits the loop. Otherwise, it tests whether the latest object projected by the loop's iterator matches the pattern of the binding declaration and can initialize its new bindings. If and only if it does, the loop filter is evaluated. If and only if the filter evaluates to `true`, control enters the body of the loop. The value of the filter is not consumed. If either the pattern of the binding declaration does not match, or the filter is not satisfied, control is transferred back to the head.
 
 7.  (Example)
 
@@ -1890,7 +1891,7 @@ let+assign = inout
       expr (',' expr)* ','?
     ```
 
-2. The type of a buffer literal is `T[n]`, where `n` is the number of components in the literal and `A` the type of all components. If a buffer literal appears in a typed context, `A` may be inferred from that context. Otherwise, the literal may not be empty, the type of `A` is inferred from the first component, and all other components must have the same type. The implementation may issue a warning if the literal has no component.
+2. The type of a buffer literal is `T[n]`, where `n` is the number of components in the literal and `T` is the type of all components. If a buffer literal appears in a typed context, `T` may be inferred from that context. Otherwise, the literal may not be empty, the type of `T` is inferred from the first component, and all other components must have the same type. The implementation may issue a warning if the literal has no components.
 
 3. (Example)
 
@@ -1973,7 +1974,7 @@ let+assign = inout
 
 4. (Example)
 
-    ``val
+    ```val
     type A {
       let m: Int
       static let n = 0
@@ -1986,13 +1987,12 @@ let+assign = inout
     let l = A.n     // OK
     ```
 
-5. An identifier may contain be suffixed by a method introducer if and only if its entity identifier refers to a method declaration for which an explicit or synthesized method implementation for the same method introducer exists.
+5. An identifier may be suffixed by a method introducer if and only if its entity identifier refers to a method declaration for which an explicit or synthesized method implementation for the same method introducer exists.
 
 6. (Example)
 
     ```val
     type Vector2 {
-
       var x: Double
       var y: Double
 
