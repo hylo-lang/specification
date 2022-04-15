@@ -219,7 +219,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     keyword ::= (one of)
-      Any Never as as! _as!! async await break catch conformance continue deinit else extension
+      Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
       false for fun if import in infix init let match namespace nil postfix prefix public return
       sink static true try type typealias var where while yield
     ```
@@ -1029,6 +1029,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     product-type-member-decl ::=
       function-decl
       subscript-decl
+      binding-decl
       product-type-decl
       type-alias-decl
     ```
@@ -1073,6 +1074,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     extension-member-decl ::=
       function-decl
       subscript-decl
+      computed-binding-decl
       product-type-decl
       type-alias-decl
     ```
@@ -1102,6 +1104,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     conformance-member-decl ::=
       function-decl
       subscript-decl
+      computed-binding-decl
       product-type-decl
       type-alias-decl
     ```
@@ -1129,12 +1132,16 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     binding-decl ::=
-      binding-head binding-type-annotation? binding-initializer?
+      stored-binding-decl
+      computed-binding-decl
+    
+    stored-binding-decl ::=
+      stored-binding-head binding-type-annotation? binding-initializer?
 
-    binding-head ::=
-      access-modifier? member-modifier* binding-introducer pattern
+    stored-binding-head ::=
+      access-modifier? member-modifier* stored-binding-introducer pattern
 
-    binding-introducer ::= 
+    stored-binding-introducer ::= 
       'let'
       'var'
       'sink' 'let'
@@ -1146,6 +1153,19 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     binding-initializer ::=
       '=' expr
+    
+    computed-binding-decl ::=
+      computed-binding-head binding-type-annotation computed-binding-body
+    
+    computed-binding-body ::=
+      brace-stmt
+      '{' subscript-impl+ '}'
+
+    computed-binding-head ::=
+      access-modifier? member-modifier* computed-binding-introducer pattern
+
+    computed-binding-introducer ::= 
+      'var'
     ```
 
 2. (Example)
@@ -1156,7 +1176,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     This binding declaration defines two new immutable bindings: `name` and `age`.
 
-3. A binding declaration defines a new binding for each name pattern in pattern. All new bindings are defined with the same capabilities.
+3. A binding declaration defines a new binding for each name pattern in __stored-binding-head__ or __computed-binding-head__. All new bindings are defined with the same capabilities.
 
     1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
@@ -1487,19 +1507,35 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     subscript-signature ::=
-      explicit-subscript-parameter-list? ':' 'var'? type-expr
-
-    explicit-subscript-parameter-list ::=
-      '(' parameter-list? ')'
+      '(' parameter-list? ')' ':' 'var'? type-expr
     ```
 
 2. The default value of a parameter declaration may not refer to another parameter in a subscript signature.
 
-3. The output type of a subscript signture defines the output type of the containing declaration. If that type is prefixed by `var`, all projections produced by the subscript are mutable. Otherwise, only the projections produced by the `inout` implementation of the subscript are mutable.
+3. The output type of a subscript signature defines the output type of the containing declaration. If that type is prefixed by `var`, all projections produced by the subscript are mutable. Otherwise, only the projections produced by the `inout` implementation of the subscript are mutable.
+
+4. (Example)
+
+    ```val
+    extension Array where Element: Copyable {
+
+      subscript generator(from start: Int): var mutating [some] () -> Maybe<Element> {
+        fun[let self, sink var i = start]() {
+          if i < self.count() {
+            defer { i+= 1 }
+            return self[i].copy()   
+          } else {
+            return nil
+          }
+        }
+      }
+
+    }
+    ```
 
 ### Subscript implementations
 
-1. A subscript implementation may be defined ikmplicitly or explicitly. Explicit subscript implementations have the form:
+1. A subscript implementation may be defined implicitly or explicitly. Explicit subscript implementations have the form:
 
     ```ebnf
     subscript-impl ::=
@@ -1513,7 +1549,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `out` parameter, called the receiver parameter, named `self`, and representing the subscript receiver.
 
-4. The passing convention of an `out` parameter dependends on the kind of the sibscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in an `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `assign` parameter in an `assign` subscript implementation.
+4. The passing convention of an `out` parameter depends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in an `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `assign` parameter in an `assign` subscript implementation.
 
 5. All parameters of a subscript implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `assign` parameters are alive before the first statement. Further:
 
@@ -1528,7 +1564,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 7. A `sink` subscript implementation must have a return statement on every terminating execution path. It must return an escapable object whose type is subtype of the output type of the containing subscript declaration.
 
 let+assign = inout
-    ```
 
 ## Parameter declarations
 
@@ -1567,7 +1602,7 @@ let+assign = inout
 
     ```ebnf
     capture-list ::=
-      '[' binding-decl (',' binding-decl)* ']'
+      '[' stored-binding-decl (',' stored-binding-decl)* ']'
 
 2. The bindings of a capture list may not have access or member modifiers.
 
@@ -1661,7 +1696,7 @@ let+assign = inout
       while-condition-item (',' while-condition-item)*
 
     while-condition-item ::=
-      binding-decl
+      stored-binding-decl
       expr
     ```
 
@@ -1678,7 +1713,7 @@ let+assign = inout
       'for' for-binding-decl for-range loop-filter? brace-stmt
 
     for-binding-decl ::=
-      binding-head binding-type-annotation?
+      stored-binding-head binding-type-annotation?
 
     for-range ::=
       'in' expr
@@ -1767,7 +1802,7 @@ let+assign = inout
 
     ```ebnf
     cond-binding-stmt ::=
-      binding-head binding-type-annotation? '??' cond-binding-body
+      stored-binding-head binding-type-annotation? '??' cond-binding-body
 
     cond-binding-body ::=
       jump-stmt
