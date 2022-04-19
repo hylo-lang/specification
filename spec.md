@@ -1575,6 +1575,7 @@ let+assign = inout
     ```ebnf
     capture-list ::=
       '[' binding-decl (',' binding-decl)* ']'
+    ```
 
 2. The bindings of a capture list may not have access or member modifiers.
 
