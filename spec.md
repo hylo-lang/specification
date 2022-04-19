@@ -983,7 +983,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-3. A *source* of conformance denotes a declaration defining the conformance. A type or conformance declaration is a source of conformance for all the traits that appear in its inheritance list. A source of conformance is conditional if it is a conformance declaration with a where clause. A type may have at most one source of conformance to a specific trait. A type that conforms to a trait `T1` shall not have a source of conformance to a trait `T2` if `T2` refines `T1` and the source of conformance to `T1` is conditional.
+3. A *source* of conformance denotes a declaration defining the conformance of a type to a trait. A type or conformance declaration is a source of conformance for all the traits that appear in its inheritance list. A source of conformance is conditional if it is a conformance declaration with a where clause. A type may have at most one source of conformance to a specific trait. A type that conforms to a trait `T1` shall not have a source of conformance to a trait `T2` if `T2` refines `T1` and the source of conformance to `T1` is conditional.
 
 4. The conformance of a type `A` to `T` is *exposed* to a lexical scope `l` if and only if `A` is exposed to `l` and the source of the conformance is:
 
@@ -1074,7 +1074,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     extension-member-decl ::=
       function-decl
       subscript-decl
-      computed-binding-decl
       product-type-decl
       type-alias-decl
     ```
@@ -1104,14 +1103,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     conformance-member-decl ::=
       function-decl
       subscript-decl
-      computed-binding-decl
       product-type-decl
       type-alias-decl
     ```
 
 2. A conformance declaration may not appear in the lexical scope of a conformance or extension declaration.
 
-3. A `public` access modifier may only appear in conformance declarations defined in the lexical scope of a module. An public conformance declaration exposes new conformances outside of the module in which it is declared.
+3. A `public` access modifier may only appear in conformance declarations defined in the lexical scope of a module. A public conformance declaration exposes new conformances outside of the module in which it is declared.
 
 4. (Example)
 
@@ -1132,40 +1130,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     binding-decl ::=
-      stored-binding-decl
-      computed-binding-decl
-    
-    stored-binding-decl ::=
-      stored-binding-head binding-type-annotation? binding-initializer?
+      binding-head binding-initializer?
 
-    stored-binding-head ::=
-      access-modifier? member-modifier* stored-binding-introducer pattern
-
-    stored-binding-introducer ::= 
-      'let'
-      'var'
-      'sink' 'let'
-      'sink' 'var'
-      'inout'
-
-    binding-type-annotation ::=
-      ':' type-expr
+    binding-head ::=
+      access-modifier? member-modifier* binding-pattern
 
     binding-initializer ::=
       '=' expr
-    
-    computed-binding-decl ::=
-      computed-binding-head binding-type-annotation computed-binding-body
-    
-    computed-binding-body ::=
-      brace-stmt
-      '{' subscript-impl+ '}'
-
-    computed-binding-head ::=
-      access-modifier? member-modifier* computed-binding-introducer pattern
-
-    computed-binding-introducer ::= 
-      'var'
     ```
 
 2. (Example)
@@ -1176,7 +1147,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     This binding declaration defines two new immutable bindings: `name` and `age`.
 
-3. A binding declaration defines a new binding for each name pattern in __stored-binding-head__ or __computed-binding-head__. All new bindings are defined with the same capabilities.
+3. A binding declaration defines a new binding for each name pattern in __binding-pattern__. All new bindings are defined with the same capabilities.
 
     1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
@@ -1603,7 +1574,7 @@ let+assign = inout
 
     ```ebnf
     capture-list ::=
-      '[' stored-binding-decl (',' stored-binding-decl)* ']'
+      '[' binding-decl (',' binding-decl)* ']'
 
 2. The bindings of a capture list may not have access or member modifiers.
 
@@ -1697,7 +1668,7 @@ let+assign = inout
       while-condition-item (',' while-condition-item)*
 
     while-condition-item ::=
-      stored-binding-decl
+      binding-pattern
       expr
     ```
 
@@ -1711,10 +1682,10 @@ let+assign = inout
 
     ```ebnf
     for-stmt ::=
-      'for' for-binding-decl for-range loop-filter? brace-stmt
+      'for' for-counter-decl for-range loop-filter? brace-stmt
 
-    for-binding-decl ::=
-      stored-binding-head binding-type-annotation?
+    for-counter-decl ::=
+      pattern
 
     for-range ::=
       'in' expr
@@ -1735,7 +1706,7 @@ let+assign = inout
     }
     ```
 
-3. The binding declaration and the filter expression of a `for` statement belong to the head of the loop. The range of a `for` statement belongs to the lexical scope in which that statement is defined.
+3. The pattern and filter expression of a `for` statement belong to the head of the loop. The range of a `for` statement belongs to the lexical scope in which that statement is defined.
 
 4. (Example)
 
@@ -1803,7 +1774,7 @@ let+assign = inout
 
     ```ebnf
     cond-binding-stmt ::=
-      stored-binding-head binding-type-annotation? '??' cond-binding-body
+      binding-pattern '??' cond-binding-body
 
     cond-binding-body ::=
       jump-stmt
@@ -2091,6 +2062,16 @@ let+assign = inout
 
 3. Arguments to `sink` parameters are consumed. Arguments to `let` parameters are projected immutably in the entire call expression. Arguments to `inout` and `set` parameters are projected mutably in the entire call expression.
 
+### Casts
+
+var a: Any = 0
+
+https://val-qs97696.slack.com/archives/C035NEV54LE/p1647711237099869
+let b   = a as Int
+inout c = a as inout Int
+var d   = a as var Int
+sink e  = a as sink Int
+
 ## Operators
 
 ### Operator notations
@@ -2115,3 +2096,24 @@ let+assign = inout
 ## Existential types
 
 ## Type aliases
+
+# Patterns
+
+## Binding patterns
+
+1. Binding patterns have the form:
+
+    ```ebnf
+    binding-pattern ::=
+      binding-introducer pattern binding-annotation?
+
+    binding-introducer ::= 
+      'let'
+      'var'
+      'sink' 'let'
+      'sink' 'var'
+      'inout'
+
+    binding-annotation ::=
+      ':' type-expr
+    ```
