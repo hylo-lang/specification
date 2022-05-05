@@ -2,10 +2,6 @@
 
 Val is a research language based on the principles of mutable value semantics (MVS) (Racordon et al. 2022) for safety and efficiency. It is designed to help developers write and maintain correct programs using powerful abstractions without loss of efficiency.
 
-Val is strongly related to the [Swift programming language](https://www.swift.org) and borrows liberally from its syntax and semantics. Nonetheless, it exposes a more elaborated memory model to the user for a tighter control over memory, blending ideas found in other languages such as Rust, C++, and Go.
-
-On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.31.5002&rep=rep1&type=pdf), ownership types [(Clarke et al. 2013)](https://doi.org/10.1007/978-3-642-36946-9_3), and capability-based type systems [(Smith et al. 2000)](https://doi.org/10.1007/3-540-46425-5_24), while striving to hide the complexity inherent to these approaches. It does so by excluding first-class references from the user model and using continuations to mitigate the loss of expressiveness.
-
 # Lexical conventions
 
 ## Program text
@@ -264,7 +260,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ## Preamble
 
-1. An *entity* is an object, projection, function, subscript, trait, type, namespace, or module.
+1. An *entity* is an object, projection, function, subscript, property, trait, type, namespace, or module.
 
 2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or an method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a __decl__.
 
@@ -272,7 +268,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of the all the uses of its sub-expressions.
 
-5. A *binding* is a name that denotes an object or a projection. The value of a binding is the denoted object or the value of the denoted projection. The value of a binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has been consumed. A mutable binding can be *resurrected* by consuming an object; an immutable binding cannot.
+5. A *binding* is a name that denotes an object or a projection. The value of a binding is the denoted object or the value of the denoted projection. The value of a binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has escaped. A mutable binding can be *resurrected* by consuming an object; an immutable binding cannot.
 
 ## Scopes and declaration spaces
 
@@ -407,9 +403,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 3. Two memory locations are *disjoint* if and only if they denote disjoint regions of storage. A memory location `l1` *contains* another memory location `l2` if and only if the region of storage denoted by `l1` contains the region denoted by `l2`. Two memory locations shall be disjoint or one shall contain the other.
 
-4. A memory location may contain other memory locations, called sub-locations. A memory location that is not a sub-location of any other memory location is called a *root location*. A memory location `l1` must be disjoint from another memory location `l2` unless unless `l1`
+4. A memory location may contain other memory locations, called sub-locations. A memory location that is not a sub-location of any other memory location is called a *root memory location*.
 
-5. A memory location may be *bound* to a type `A`. Such a memory location shall have the size and alignment suitable to store an object of type `A` and shall not contain any other memory location. Otherwise, the behavior is undefined. The memory locations contained in a memory location bound to `A` are bound according to the memory layout of `A`.
+5. A root memory location may be *bound* to a type `A`. Such a memory location shall have the size and alignment suitable to store an object of type `A` and shall not contain any other memory location. Otherwise, the behavior is undefined. The memory locations contained in a memory location bound to `A` are bound according to the memory layout of `A`.
 
 6. A memory location bound to `A` may be used as storage for an object of type `A`. A bound memory location shall not be rebound to another type or deallocated if it is used as storage for an object whose lifetime has not yet ended, or if it is contained in a bound memory location. Otherwise, the behavior is undefined.
 
@@ -431,7 +427,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ## Objects
 
-1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, call to a `sink` accessor, or it is the value of an escapable binding. [Note: A function is not an object but a lambda is.]
+1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, `sink` subscript call, `sink` property call, or it is the value of an sink binding. [Note: A function is not an object but a lambda is.]
 
 2. An object has a type determined at compile-time. That type might be polymorphic; in that case, the implementation generates information associated with the object that makes it possible to determine its concrete dynamic type at runtime.
 
@@ -464,12 +460,12 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The lifetime of an object of type `A ` ends when:
 
-    1. its destructor has returned, and
-    2. the memory location it occupies is rebound, resued for another object, or deallocated.
+    1. a bound call to any of its sink methods has returned, and
+    2. the memory location it occupies is rebound, reused for another object, or deallocated.
 
 3. The properties ascribed to objects throughout this document apply for a given object only during its lifetime. [Note: The behavior of an object under construction and destruction might not be the same as the behavior of an object whose lifetime has started and not ended.]
 
-4. An object is said to be *initializing* in the period after its memory location has been bound abd before its lifetime has started, *alive* throughout its lifetime, *deinitializing* during a bound call of a consuming method of that object, and *dead* in the period after its lifetime has ended and before its storage has been rebound, reused, or deallocated.
+4. An object is said to be *initializing* in the period after its memory location has been bound and before its lifetime has started, *alive* throughout its lifetime, *deinitializing* during a bound call to a sink method of that object, and *dead* in the period after its lifetime has ended and before its storage has been rebound, reused, or deallocated.
 
 5. Unless specified otherwise, a program shall not manipulate an object outside of its lifetime. Behavior is undefined if the program:
 
@@ -477,7 +473,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     2. projects the object or its sub-objects; or
 
-    3. performs a bound call of a method of the object.
+    3. performs a bound call to a method of the object.
 
 6. If, after the lifetime of an object has ended and before the memory location which the object occupied is reused or deallocated, a new object is stored at the memory location which the original object occupied, the name of the original object automatically denotes the new object and, once the lifetime of the new object has started, can be used to manipulate the new object.
 
@@ -499,9 +495,9 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Sinkability
 
-1. An object is said to be *consumed* if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable, escapable, or member binding.
+1. An object is said to escape if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable, sink, or member binding.
 
-2. An *unsinkable* may not be consumed by any operation except its destructor. An object of type `[let A]` or `[inout A]` is unsinkable. A closure that captures projections is unsinkable. An object initialized with an unsinkable object is unsinkable.
+2. Objects of type `[let A]` or `[inout A]`, closures that capture projections, and objects initialized with an unsinkable object are said to be *unsinkable*. An unsinkable object may not escape unless the escape is caused by a bound call to any of its sink methods.
 
 3. (Example)
 
@@ -520,20 +516,18 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A sinkable object evaluated by a non-consuming expression is escapable at a given program point if it is not projected by any other object at that program point.
 
-2. A sinkable object bound to an escapable binding is escapable at a given program point if it is not projected by any other object at that program point.
+2. A sinkable object bound to a binding is escapable at a given program point if it is not projected by any other object at that program point.
 
 3. (Example)
 
     ```val
     fun print_and_return_forty_two() -> Int {
-      sink let x = 42 // the value of 'x' is escapable here
-      let y = x       // the value of 'x' is not escapable here
-      print(y)        // the value of 'x' is escapable afterward
-      return x        // the value of 'x' escapes here
+      let x = 42 // the value of 'x' is escapable here
+      let y = x  // the value of 'x' is not escapable here
+      print(y)   // the value of 'x' is escapable afterward
+      return x   // the value of 'x' escapes here
     }
     ```
-
-    The value of `y` is never escapable because `y` is not an escapable binding.
 
 4. An escapable object may be consumed.
 
@@ -543,7 +537,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. An object `o1` projects an object `o2` if and only if:
 
-    1. `o1` is a projection of `o2` or one of `o2`'s sub-objects; or
+    1. `o1` is a projection of `o2` or one of the sub-objects of `o2`; or
 
     2. a sub-object of `o1` projects `o2`.
 
@@ -562,15 +556,15 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     }
     ```
 
-5. The object yielded by a subscript projects the arguments bound to the subscript's out parameters.
+5. The object yielded by a `let` or `inout` subscript or property call projects the arguments bound to the subscript or property's yield parameters.
 
 6. (Example)
 
     ```val
     subscript min<T, E>(
-      _ a: out T, _ b: out T, by less_than: [E] (T, T) -> Bool
+      _ a: yield T, _ b: yield T, by less_than: [E] (T, T) -> Bool
     ): T {
-      let { if less_than(a, b) { yield a } else { yield b } }
+      let { yield if !less_than(a, b) { b } else { a } }
     }
 
     fun main() {
@@ -596,10 +590,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```val
     fun main() {
       var x = 42
-      var y = x // mutable projection begins here
-      print(x)  // error: the value of 'x' is projected mutably
-      x += 1    // error: the value of 'x' is projected mutably
-      print(y)  // mutable projection ends afterward
+      inout y = x // mutable projection begins here
+      print(x)    // error: the value of 'x' is projected mutably
+      x += 1      // error: the value of 'x' is projected mutably
+      print(y)    // mutable projection ends afterward
     }
     ```
 
@@ -608,10 +602,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
     ```val
     fun main() {
       var x = 42
-      let y = y // immutable projection begins here
-      print(x)  // OK
-      x += 1    // error: the value of 'x' is projected immutably
-      print(y)  // immutable projection ends afterward
+      let y = y   // immutable projection begins here
+      print(x)    // OK
+      x += 1      // error: the value of 'x' is projected immutably
+      print(y)    // immutable projection ends afterward
     }
     ```
 
@@ -677,8 +671,6 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
       - `[E] ((A2) -> B1) <: ((A1) -> B2)` (where `A1 <: A2` and `B1 <: B2`)
 
-      - `(T & U & V) <: (T & U)`
-
       - `(any T & U where ::T.Element == Int) <: (any T where ::T.Element == Int)`
 
 ## Generic types
@@ -738,7 +730,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       static-modifier
 
     receiver-modifier ::= (one of)
-      sink inout out
+      sink inout yield
 
     static-modifier ::=
       'static'
@@ -746,11 +738,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. A member modifier may appear at most once in a declaration.
 
-3. The `static` modifier may only apply to a binding declaration, a function declaration, or a subscript declaration at type scope.
+3. The `static` modifier may only apply to a binding, function, subscript, or property declaration at type scope.
 
-4. A receiver modifier may only appear in a function declaration or a subscript declaration at type scope.
+4. A receiver modifier may only appear in a function, subscript, or property declaration at type scope.
 
-5. The `out` modifier may only appear in a subscript declaration.
+5. The `yield` modifier may only appear in a subscript or property declaration.
 
 ## Conformance lists
 
@@ -786,7 +778,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       identifier ':' 'size'
     ```
 
-2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it has been written in the where clause.
+2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it had been written in the where clause.
 
 3. (Example)
 
@@ -820,7 +812,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     2. A conformance constraint specifies that the type denoted by the left hand side of `:` be conforming to the traits specified in __trait-composition__.
 
-    3. A size constraint is an expression denoting a predicate over one or more size parameters. It must be an expression of type `Bool` and shall only refer to size parameters or names introduced in global scopes.
+    3. A size constraint is an expression denoting a predicate over one or more size parameters. It must be an expression of type `Bool` and shall only refer to names introduced in global scopes or size parameters.
 
 ## Trait declarations
 
@@ -847,6 +839,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       associated-decl
       function-decl
       subscript-decl
+      property-decl
     ```
 
 3. (Example)
@@ -860,7 +853,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 4. A trait declaration may only appear at global scope. It introduces __identifier__ as a name denoting the declared trait.
 
-5. The associated type, associated size, function, and subscript declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
+5. The associated type, associated size, function, subscript, and property declarations that appear in the body of a trait specify the *requirements* of that trait. Such declarations may not have access levels. [Note: The access level of a requirement implementation depends on the visibility of the conformances requiring that implementation.]
 
 ### Associated type and size requirements
 
@@ -905,7 +898,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
 
-2. When a method requirement declaration has a __function-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines denotes a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
+2. When a method requirement declaration has a __function-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
 
 3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __function-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
 
@@ -913,7 +906,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```val
     trait State {
-      subscript x: Int { let inout }
+      property x: Int { let inout }
     }
 
     trait Counter {
@@ -939,11 +932,19 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 ### Subscript requirements
 
-1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement declaration* that defines one or more *subscript requirements*. A subscript requirement is the specification of a subscript that must be implemented in conforming types.
+1. A subscript declaration that appears in the body of a trait declaration is a *subscript requirement declaration* that defines one or more *subscript accessor requirements*. A subscript accessor requirement is the specification of a subscript accessor that must be implemented in conforming types.
 
-2. A subscript requirement declaration must have a __subscript-bundle-body__. Each subscript implementation in that body denotes a subscript requirement.
+2. A subscript requirement declaration must have a __subscript-bundle-body__. Each subscript accessor implementation in that body denotes a subscript accessor requirement.
 
-3. A subscript requirement may have one or several default implementations. A default implementation may be defined as the body of a subscript implementation in the __subscript-bundle-body__ of a subscript requirement requirement, or via a default requirement implementation declared in a trait extension.
+3. A subscript accessor requirement may have one or several default implementations. A default implementation may be defined as the body of a subscript accessor implementation in the __subscript-bundle-body__ of a subscript requirement declaration, or via a default requirement implementation declared in a trait extension.
+
+### Property requirements
+
+1. A property declaration that appears in the body of a trait declaration is a *property requirement declaration* that defines one or more *property accessor requirements*. A property accessor requirement is the specification of a property accessor that must be implemented in conforming types.
+
+2. A property requirement declaration must have a __subscript-bundle-body__. Each subscript accessor implementation in that body denotes a property accessor requirement.
+
+3. A property accessor requirement may have one or several default implementations. A default implementation may be defined as the body of a property accessor implementation in the __subscript-bundle-body__ of a property requirement declaration, or via a default requirement implementation declared in a trait extension.
 
 ### Trait refinement
 
@@ -1153,11 +1154,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     2. A binding declaration introduced with `var` or `inout` defines a mutable binding. The value of a live mutable binding may be projected mutably or immutably.
 
-    3. A binding declaration introduced with `sink` defines an escapable binding. An escapable binding may only be assigned to sinkable objects. The value of an escapable binding may be consumed at a given program point if is escapable at that program point.
+    3. A binding declaration introduced with `sink` defines a sink binding. A sink binding may only be assigned to sinkable objects.
 
-  A mutable binding can appear on the left side of an assignment, on the right side of an assignment to a non-escapable mutable binding, as the initializer of non-escapable mutable binding, as argument to an `inout` parameter, or as argument to an `assign` parameter. An escapable binding can appear as the the operand of a consuming operation.
+  A mutable binding can appear on the left side of an assignment, on the right side of an assignment, as the initializer of a binding, as argument to an `inout` parameter, or as argument to an `set` parameter.
 
-4. The pattern of a binding declaration may not contain any binding patterns and, unless it appears in the condition of a loop statement or in the condition of a selection expression, it may not contain any expression patterns.
+4. The pattern of a binding declaration may not contain any expression patterns.
 
 5. A binding declaration may be defined at module scope, namespace scope, type scope, or function scope.
 
@@ -1247,8 +1248,11 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```ebnf
     function-decl ::=
-      'default' 'init'
+      memberwise-ctor-decl
       function-head function-signature function-body?
+
+    memberwise-ctor-decl ::=
+      'memberwise' 'init'
 
     function-head ::=
       access-modifier? member-modifier* function-identifier generic-clause? capture-list?
@@ -1286,23 +1290,23 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     2. A function declaration at type scope that contains a `static` modifier is called a static method declaration; it is also a global function declaration. A static method declaration introduces one global function.
 
-    3. A function declaration at type scope that does not contain a `static` modifier is called a method declaration. It introduces one or more methods.
+    3. A function declaration at type scope that does not contain a `static` modifier and is not declared with `init` or `memberwise init` is called a method declaration. It introduces one or more methods.
 
-    4. A function declaration at type scope declared with `init` is called a constructor declaration. It introduces one global function.
+    4. A function declaration at type scope declared with `init` is called a *constructor* declaration. It introduces one global function.
+    
+    5. A function declaration at type scope declared with `memberwise init` is called an *explicit memberwise constructor* declaration. In introduces one global function.
 
-    5. A function declaration at type scope declared with `deinit` is called a destructor declaration. It introduces one sink method.
+    6. A function declaration at type scope declared with `deinit` is called a destructor declaration. It introduces one sink method.
 
-    6. A function declaration at function scope is called a local function declaration. It introduces a local function.
+    7. A function declaration at function scope is called a local function declaration. It introduces a local function.
 
 5. The `init` introducer and the `deinit` introducer may only appear in a function declaration at type scope.
 
 6. A method implementation may only appear in a method declaration.
 
-7. A function declaration of the form `default init` is an *explicit default constructor* and may only appear in a product type declaration.
+7.  An operator notation specifier defines an operator member function; it may only appear in a function declaration at type scope.
 
-8.  An operator notation specifier defines an operator member function; it may only appear in a function declaration at type scope.
-
-9.  A capture list may only appear in a function declaration at local scope.
+8.  A capture list may only appear in a function declaration at local scope.
 
 ### Function signatures
 
@@ -1315,7 +1319,7 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The default value of a parameter declaration may not refer to another parameter in a function signature.
 
-3. The output type of a function signture defines the output type of the containing declaration. If that type is omitted, the output type of the declaration is interpreted as `()`.
+3. The output type of a function signature defines the output type of the containing declaration. If that type is omitted, the output type of the declaration is interpreted as `()`.
 
 ### Function implementations
 
@@ -1323,13 +1327,13 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
 2. The parameters declared in the signature of the function declaration containing a function implementation define the parameters of that implementation.
 
-3. All parameters of a function implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `assign` parameters are alive before the first statement. Further:
+3. All parameters of a function implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `set` parameters are alive before the first statement. Further:
 
     1. `sink` parameters are immutable and escapable; and
 
     2. `inout` parameters are mutable and escapable, and they must be alive at the end of every terminating execution path; and
 
-    3. `assign` parameters are dead and mutable, and they must be alive at the end of every terminating execution path.
+    3. `set` parameters are dead and mutable, and they must be alive at the end of every terminating execution path.
 
 4. The output type of a function implementation is the output type of the containing function declaration, unless it is an explicit `inout` method implementation (see Method implementations). A function implementation must have a return statement on every terminating execution path, unless the output type of the containing declaration is `()`. In that case, explicit return statements may be omitted. A function implementation must return an escapable object whose type is a subtype of the output type of the containing method declaration.
 
@@ -1441,10 +1445,10 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
 
     ```val
     subscript min<T, E>(_ a: T, _ b: T, by comparator: [E](T, T) -> Bool): Int {
-      let    { if comparator(a, b) { yield a } else { yield b } }
-      inout  { if comparator(a, b) { yield &a } else { yield &b } }
-      assign { if comparator(a, b) { yield &a } else { yield &b } }
-      sink   { if comparator(a, b) { return a } else { return b } }
+      let   { yield if comparator(a, b) { a } else { b } }
+      inout { yield &(if comparator(a, b) { a } else { b }) }
+      sink  { return if comparator(a, b) { a } else { b } }
+      set   { if comparator(a, b) { a = new_value } else { b = new_value } }
     }
     ```
 
@@ -1513,29 +1517,42 @@ On a theoretical front, Val owes greatly to linear types [(Wadler 1990)](https:/
       subscript-introducer brace-stmt?
 
     subscript-introducer ::= (one of)
-      let sink inout assign
+      let sink inout set
     ```
 
-2. Am explicit subscript implementation introduced with `let` is called a `let` subscript implementation; one introduced with `sink` is called a `sink` subscript implementation; one introduced with `inout` is called an `inout` subscript implementation; one introduced with `assign` is called an `assign` subscript implementation.
+2. An explicit subscript implementation introduced with `let` is called a `let` subscript implementation; one introduced with `sink` is called a `sink` subscript implementation; one introduced with `inout` is called an `inout` subscript implementation; one introduced with `set` is called a `set` subscript implementation.
 
-3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `out` parameter, called the receiver parameter, and named `self`, represents the subscript receiver.
+3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `yield` parameter, called the receiver parameter, and named `self`, represents the subscript receiver.
 
-4. The passing convention of an `out` parameter depends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in a `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `assign` parameter in an `assign` subscript implementation.
+4. The passing convention of an `yield` parameter depends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in a `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `set` parameter in an `set` subscript implementation.
 
-5. All parameters of a subscript implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `assign` parameters are alive before the first statement. Further:
+5. All parameters of a subscript implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `set` parameters are alive before the first statement. Further:
 
-    1. `sink` parameters are immutable and escapable.
+    1. `sink` parameters are mutable and escapable.
 
     2. `inout` parameters are mutable and escapable. They must be alive at the end of every terminating execution path.
 
-    3. `assign` parameters are dead and mutable. They must be alive at the end of every terminating execution path.
+    3. `set` parameters are dead and mutable. They must be alive at the end of every terminating execution path.
 
 6.  A `let` subscript implementation or an `inout` subscript implementation must have exactly one a yield statement on every terminating execution path. Given a subscript declaration with an output type `A`, a `let` subscript implementation must yield an immutable projection of an object whose type is subtype of `A`, unless the output signature of the subscript declaration is prefixed by `var`. In that case it must yield an mutable projection of an object of type `A`. An `inout` subscript implementation must yield a mutable projection of an object of type `A`.
 
 7. A `sink` subscript implementation must have a return statement on every terminating execution path. It must return an escapable object whose type is subtype of the output type of the containing subscript declaration.
 
-<!-- FIXME: unfinished code block. -->
-let+assign = inout
+8. An `inout` subscript implementation may be synthesized from a `let` and an `set` subscript implementation. A `sink` subscript implementation may be synthesized from a `let` subscript implementation.
+
+## Property declarations
+
+### General
+
+1. Property declarations have the form:
+
+    ```ebnf
+    property-decl ::=
+      property-head subscript-body
+
+    property-head ::=
+      member-modifier* 'property' identifier
+    ```
 
 ## Parameter declarations
 
@@ -1562,7 +1579,7 @@ let+assign = inout
 
     3. A parameter declared with the `inout` convention is called an `inout` parameter.
 
-    4. A parameter declared with the `assign` convention is called an `assign` parameter.
+    4. A parameter declared with the `set` convention is called an `set` parameter.
 
 4. `let` parameters and `sink` parameters may have a default value.
 
@@ -2111,8 +2128,7 @@ sink e  = a as sink Int
     binding-introducer ::= 
       'let'
       'var'
-      'sink' 'let'
-      'sink' 'var'
+      'sink'
       'inout'
 
     binding-annotation ::=
