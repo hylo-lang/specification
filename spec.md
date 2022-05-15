@@ -20,14 +20,11 @@ Val is a research language based on the principles of mutable value semantics (M
 
     3. New-line delimiters are ignored unless they appear between the opening and closing delimiters of a character or string literal. Unicode characters with the "Line_Break" property are recognized as new-line delimiters.
 
-
 ## Comments
 
 1. The character sequence `//` starts a single-line comment, which terminates immediately before the next new-line delimiter.
 
-2. The character sequences `/*` and `*/` are multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest, and need not contain any new-line characters.
-
-3. The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.
+2. The character sequences `/*` and `*/` are multiline comment opening and closing delimiters, respectively. A multiline comment opening  delimiter starts a comment that terminates immediately after a matching closing delimiter. Each opening delimiter must have a matching closing delimiter. Multiline comments may nest and need not contain any new-line characters. [Note: The character sequences `//` have no special meaning in a multiline comment. The character sequences `/*` and `*/` have no special meaning in a single-line comment. The character sequences `//` and `/*` have no special meaning in a string literal. String and character literal delimiters have no special meaning in a comment.]
 
 ## Tokens
 
@@ -216,8 +213,8 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     keyword ::= (one of)
       Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
-      false for fun if import in infix init let match namespace nil postfix prefix public return
-      sink static true try type typealias var where while yield
+      false for fun if import in infix init inout let match namespace nil postfix prefix public return
+      set sink static true try type typealias var where while yielded
     ```
 
 ### Identifiers
@@ -262,13 +259,13 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. An *entity* is an object, projection, function, subscript, property, trait, type, namespace, or module.
 
-2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or an method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a __decl__.
+2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a __decl__.
 
 3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let`. are method names.
 
 4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of the all the uses of its sub-expressions.
 
-5. A *binding* is a name that denotes an object or a projection. The value of a binding is the denoted object or the value of the denoted projection. The value of a binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has escaped. A mutable binding can be *resurrected* by consuming an object; an immutable binding cannot.
+5. A *binding* is a name that denotes an object or a projection. The value of a binding is the object denoted by that binding or the value of the projection denoted by that binding. A binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has escaped, or if there are no uses of it at that program point and any other program point reachable from there. A mutable binding can be *resurrected* by reassigning it to an object; an immutable binding cannot.
 
 ## Scopes and declaration spaces
 
@@ -295,7 +292,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     The declarations space of the type declaration includes `foo` and `bar`.
 
-7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. The same name may not be introduced more than once in a declaration space.
+7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be conditionally introduced if it is introduced by an extension or conformance declaration that has a where clause; otherwise, it is said to be unconditionally introduced. The same name may not be unconditionally introduced more than once in a declaration space.
 
     ```val
     type A {
@@ -427,7 +424,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Objects
 
-1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, `sink` subscript call, `sink` property call, or it is the value of an sink binding. [Note: A function is not an object but a lambda is.]
+1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, `sink` subscript call, `sink` property call, or it is the value of a unique binding. [Note: A function is not an object but a lambda is.]
 
 2. An object has a type determined at compile-time. That type might be polymorphic; in that case, the implementation generates information associated with the object that makes it possible to determine its concrete dynamic type at runtime.
 
@@ -458,22 +455,13 @@ Val is a research language based on the principles of mutable value semantics (M
     1. a memory location has been allocated and bound to `A`, and
     2. its initialization is complete.
 
-2. The lifetime of an object of type `A ` ends when:
-
-    1. a bound call to any of its sink methods has returned, and
-    2. the memory location it occupies is rebound, reused for another object, or deallocated.
+2. The lifetime of an object of type `A ` ends when a bound call to any of its sink methods has returned.
 
 3. The properties ascribed to objects throughout this document apply for a given object only during its lifetime. [Note: The behavior of an object under construction and destruction might not be the same as the behavior of an object whose lifetime has started and not ended.]
 
 4. An object is said to be *initializing* in the period after its memory location has been bound and before its lifetime has started, *alive* throughout its lifetime, *deinitializing* during a bound call to a sink method of that object, and *dead* in the period after its lifetime has ended and before its storage has been rebound, reused, or deallocated.
 
-5. Unless specified otherwise, a program shall not manipulate an object outside of its lifetime. Behavior is undefined if the program:
-
-    1. accesses the object or its sub-objects; or
-
-    2. projects the object or its sub-objects; or
-
-    3. performs a bound call to a method of the object.
+5. Unless otherwise specified, the behavior of a program that accesses or projects an object or its sub-objects outside of the object's lifetime is undefined.
 
 6. If, after the lifetime of an object has ended and before the memory location which the object occupied is reused or deallocated, a new object is stored at the memory location which the original object occupied, the name of the original object automatically denotes the new object and, once the lifetime of the new object has started, can be used to manipulate the new object.
 
@@ -493,57 +481,45 @@ Val is a research language based on the principles of mutable value semantics (M
 
     3. When an alignment is larger than another it represents a stricter alignment.
 
-### Sinkability
-
-1. An object is said to escape if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable, sink, or member binding.
-
-2. Objects of type `[let A]` or `[inout A]`, closures that capture projections, and objects initialized with an unsinkable object are said to be *unsinkable*. An unsinkable object may not escape unless the escape is caused by a bound call to any of its sink methods.
-
-3. (Example)
-
-    ```val
-    type Wrapper<A> { var wrapped: A }
-
-    fun main() {
-      let w = 2
-      let x = Wrapper(wrapped: w.copy()) // the value of 'x' is sinkable
-      let y = Wrapper(wrapped: [let w])  // the value of 'y' is unsinkable
-      let z = Wrapper(wrapped: y)        // the value of 'z' is unsinkable
-    }
-    ```
-
 ### Escapability
 
-1. A sinkable object evaluated by a non-consuming expression is escapable at a given program point if it is not projected by any other object at that program point.
+1. An object is *sinkable* if its type conforms to the `Sinkable` trait. An object that is not sinkable is `unsinkable`.
 
-2. A sinkable object bound to a binding is escapable at a given program point if it is not projected by any other object at that program point.
+2. An object is said to escape if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable or member binding.
+
+[Note for Dim: when the object is passed to sink, it gets unbound right before being passed]
+[Note for Dim: define escapability in terms of bindings rather than projections]
+
+3. A sinkable object may escape at a given program point if it is not bound after that program point. An unsinkable object may never escape.
 
 3. (Example)
 
     ```val
     fun print_and_return_forty_two() -> Int {
-      let x = 42 // the value of 'x' is escapable here
-      let y = x  // the value of 'x' is not escapable here
-      print(y)   // the value of 'x' is escapable afterward
-      return x   // the value of 'x' escapes here
+      let x = 42 // 'x' is escapable here
+      let y = x  // 'x' is not escapable here
+      print(y)   // 'x' is escapable afterward
+      return x   // 'x' escapes here
     }
     ```
 
-4. An escapable object may be consumed.
-
 ## Projections
+
+[Note for Dim: properties and subscripts are projections]
 
 1. A projection exposes an object.
 
-2. An object `o1` projects an object `o2` if and only if:
+2. The value of a projection is the object exposed by that projection. A projection has the type of its value.
 
-    1. `o1` is a projection of `o2` or one of the sub-objects of `o2`; or
+3. A projection `p` projects an object `o` if:
 
-    2. a sub-object of `o1` projects `o2`.
+    1. `p` is a projection of `o` or one of its sub-objects; or
 
-3. When an object `o1` projects an object `o2`, `o2` is said to be projected by `o1`. [Note: Copying creates a new object that is not a projection.]
+    2. a sub-object of the object projected by `p` captures a projection of `o`.
 
-4. (Example)
+4. When a projection `p` projects an object `o`, `o` is said to be projected by `p`. [Note: Copying creates a new object that is not a projection.]
+
+5. (Example)
 
     ```val
     type A { fun zero: Int { 0 } }
@@ -551,18 +527,18 @@ Val is a research language based on the principles of mutable value semantics (M
     fun main() {
       let x = A()
       let y = x.zero
-        // the value of 'y' projects that of 'x'
-        // corollary: the value of 'x' is projected by that of 'y'
+        // 'y' projects 'x'
+        // corollary: 'x' is projected by 'y'
     }
     ```
 
-5. The object yielded by a `let` or `inout` subscript or property call projects the arguments bound to the subscript or property's yield parameters.
+6. The projection yielded by a `let` or `inout` subscript or property call projects the arguments bound to the subscript or property's yielded parameters.
 
-6. (Example)
+7. (Example)
 
     ```val
     subscript min<T, E>(
-      _ a: yield T, _ b: yield T, by less_than: [E] (T, T) -> Bool
+      _ a: yielded T, _ b: yielded T, by less_than: [E] (T, T) -> Bool
     ): T {
       let { yield if !less_than(a, b) { b } else { a } }
     }
@@ -571,43 +547,66 @@ Val is a research language based on the principles of mutable value semantics (M
       let comparator = Int.<
       let (x, y) = (2, 3)
       let z = min[x, y, by: comparator]
-        // the value of 'z' projects both the values of 'x' and 'y',
-        // but not that of 'comparator'
+        // 'z' projects both 'x' and 'y', but not 'comparator'
       print(z)
     }
     ```
 
     The expression `min[x, y, by: comparator]` is a call to the `let` implementation of `min`, which projects the values of its first and second arguments, but not that of its third argument.
 
-7. A closure projects the objects it captures by projection.
+8. If a projection `p` projects an object `o` immutably, `o` is immutable for the duration of `p`'s lifetime. If a projection `p` projects an object `o` mutably, `o` is inaccessible for the duration of `p`'s lifetime.
 
-8. An object projects the objects captured by the stored projections with which it has been initialized.
-
-9.  If an object `o1` projects an object `o2` immutably, `o2` is immutable for the duration of `o1`'s lifetime. If an object `o1` projects an object `o2` mutably, `o2` is inaccessible for the duration of `o1`'s lifetime.
-
-10. (Example) Mutable projection:
+9. (Example) Mutable and immutable projections:
 
     ```val
-    fun main() {
+    fun f1() {
       var x = 42
       inout y = x // mutable projection begins here
-      print(x)    // error: the value of 'x' is projected mutably
-      x += 1      // error: the value of 'x' is projected mutably
+      print(x)    // error: 'x' is projected mutably
+      x += 1      // error: 'x' is projected mutably
       print(y)    // mutable projection ends afterward
     }
-    ```
 
-11. (Example) Immutable projection:
-
-    ```val
-    fun main() {
+    fun f2() {
       var x = 42
       let y = y   // immutable projection begins here
       print(x)    // OK
-      x += 1      // error: the value of 'x' is projected immutably
+      x += 1      // error: 'x' is projected immutably
       print(y)    // immutable projection ends afterward
     }
     ```
+
+10. An object may capture a projection at its initialization. A captured projection is released when the lifetime of the capturing object ends. The captured projections of a closure are defined by its environment. The captured projections of a tuple or instance of a product type are defined by the stored projections that were used to initialize that object.
+
+## Modules
+
+1. A Val program organizes code into *modules*. A module is a collection of declarations.
+
+2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> ()`. A program shall contain exactly one entry module.
+
+## Program execution
+
+1. A program shall designate one entry module.
+
+2. Executing a program starts a thread of execution in which the `main` function of its entry module is invoked. [Note: the arguments passed to the program from the environment in which it is run are stored in the global variable `Val.Environment.Arguments`.]
+
+### Sequential execution
+
+1. The *immediate sub-expressions* of an expression `e` are:
+
+    1. the operands of `e`,
+    
+    2. any function call that `e` implicitly invokes, or
+
+    3. if `e` is a function call or implicitly invokes a function, the expression of each default argument used in the call.
+
+2. A *sub-expression* of an expression `e` is an immediate sub-expression of `e` or a sub-expression of an immediate sub-expression of `e`.
+
+3. Modifying an object, calling a library I/O function, or calling a function that does any of those operations are all side effects, which are changes in the state of the execution environment. *Evaluation* of an expression (or a sub-expression) in general includes both value computations (including determining the identity of an object for lvalue evaluation and fetching a value previously assigned to an object for rvalue evaluation) and initiation of side effects.
+
+4. *Sequenced before* is an asymmetric, transitive, pair-wise relation between evaluations executed by a single thread, which induces a partial order among those evaluations. Given any two evaluations A and B, if A is sequenced before B (or, equivalently, B is sequenced after A), then the execution of A shall precede the execution of B. If A is not sequenced before B and B is not sequenced before A, then A and B are unsequenced. [Note: The execution of unsequenced evaluations can overlap.] Evaluations A and B are indeterminately sequenced when either A is sequenced before B or B is sequenced before A, but it is unspecified which. [Note: Indeterminately sequenced evaluations cannot overlap, but either could be executed first.] An expression `e1` is said to be sequenced before an expression `e2` if every value computation and every side effect associated with the expression `e1` is sequenced before every value computation and every side effect associated with the expression `e2`.
+
+5. The immediate sub-expressions of an expression are sequenced from left to right.
 
 # Types
 
@@ -730,7 +729,7 @@ Val is a research language based on the principles of mutable value semantics (M
       static-modifier
 
     receiver-modifier ::= (one of)
-      sink inout yield
+      sink inout yielded
 
     static-modifier ::=
       'static'
@@ -742,7 +741,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 4. A receiver modifier may only appear in a function, subscript, or property declaration at type scope.
 
-5. The `yield` modifier may only appear in a subscript or property declaration.
+5. The `yielded` modifier may only appear in a subscript or property declaration.
 
 ## Conformance lists
 
@@ -1154,8 +1153,6 @@ Val is a research language based on the principles of mutable value semantics (M
 
     2. A binding declaration introduced with `var` or `inout` defines a mutable binding. The value of a live mutable binding may be projected mutably or immutably.
 
-    3. A binding declaration introduced with `sink` defines a sink binding. A sink binding may only be assigned to sinkable objects.
-
   A mutable binding can appear on the left side of an assignment, on the right side of an assignment, as the initializer of a binding, as argument to an `inout` parameter, or as argument to an `set` parameter.
 
 4. The pattern of a binding declaration may not contain any expression patterns.
@@ -1176,7 +1173,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. A local binding declaration must contain an initializer unless it appears in the condition of a match expression. If the binding declaration is a sub-statement in a brace statement, initialization occurs immediately after declaration. If the binding declaration is a condition in a loop statement or a condition in a selection expression, initialization occurs immediately after a successful pattern matching.
 
-3. A member binding declaration may not have an initializer. Initialization occurs in the constructor of the object of which the introduced bindings are members (see Type initialization).
+3. A member binding declaration may not have an initializer. Initialization occurs in the initializer of the object of which the introduced bindings are members (see Type initialization).
 
 4. The initialization of an escapable binding, or a binding whose declaration is introduced with `var`, consumes the value of its initializer.
 
@@ -1292,11 +1289,11 @@ Val is a research language based on the principles of mutable value semantics (M
 
     3. A function declaration at type scope that does not contain a `static` modifier and is not declared with `init` or `memberwise init` is called a method declaration. It introduces one or more methods.
 
-    4. A function declaration at type scope declared with `init` is called a *constructor* declaration. It introduces one global function.
+    4. A function declaration at type scope declared with `init` is called a *initializer* declaration. It introduces one global function.
     
-    5. A function declaration at type scope declared with `memberwise init` is called an *explicit memberwise constructor* declaration. In introduces one global function.
+    5. A function declaration at type scope declared with `memberwise init` is called an *explicit memberwise initializer* declaration. In introduces one global function.
 
-    6. A function declaration at type scope declared with `deinit` is called a destructor declaration. It introduces one sink method.
+    6. A function declaration at type scope declared with `deinit` is called a deinitializer declaration. It introduces one sink method.
 
     7. A function declaration at function scope is called a local function declaration. It introduces a local function.
 
@@ -1522,9 +1519,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. An explicit subscript implementation introduced with `let` is called a `let` subscript implementation; one introduced with `sink` is called a `sink` subscript implementation; one introduced with `inout` is called an `inout` subscript implementation; one introduced with `set` is called a `set` subscript implementation.
 
-3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `yield` parameter, called the receiver parameter, and named `self`, represents the subscript receiver.
+3. The parameters declared in the signature of the subscript declaration containing a subscript implementation define the parameters of that implementation. In a member subscript declaration, an additional implicit `yielded` parameter, called the receiver parameter, and named `self`, represents the subscript receiver.
 
-4. The passing convention of an `yield` parameter depends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in a `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `set` parameter in an `set` subscript implementation.
+4. The passing convention of a `yielded` parameter depends on the kind of the subscript implementation: it is a `let` parameter in a `let` subscript implementation; or it is a `sink` parameter in a `sink` subscript implementation; or it is an `inout` parameter in an `inout` subscript implementation; or it is an `set` parameter in an `set` subscript implementation.
 
 5. All parameters of a subscript implementation are treated as immediate local bindings in that implementation, defined before its first statement. All parameters except `set` parameters are alive before the first statement. Further:
 
@@ -1534,7 +1531,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     3. `set` parameters are dead and mutable. They must be alive at the end of every terminating execution path.
 
-6.  A `let` subscript implementation or an `inout` subscript implementation must have exactly one a yield statement on every terminating execution path. Given a subscript declaration with an output type `A`, a `let` subscript implementation must yield an immutable projection of an object whose type is subtype of `A`, unless the output signature of the subscript declaration is prefixed by `var`. In that case it must yield an mutable projection of an object of type `A`. An `inout` subscript implementation must yield a mutable projection of an object of type `A`.
+6.  A `let` subscript implementation or an `inout` subscript implementation must have exactly one a yield statement on every terminating execution path. Given a subscript declaration with an output type `A`, a `let` subscript implementation must yield an immutable projection of an object whose type is subtype of `A`, unless the output signature of the subscript declaration is prefixed by `var`. In that case it must yield a mutable projection of an object of type `A`. An `inout` subscript implementation must yield a mutable projection of an object of type `A`.
 
 7. A `sink` subscript implementation must have a return statement on every terminating execution path. It must return an escapable object whose type is subtype of the output type of the containing subscript declaration.
 
@@ -2062,7 +2059,7 @@ Val is a research language based on the principles of mutable value semantics (M
     call-argument-list ::=
       call-argument ( ',' call-argument )*
 
-    call-argument :=
+    call-argument ::=
       (identifier ':')? expr
     ```
 
@@ -2082,7 +2079,29 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ### Casts
 
-var a: Any = 0
+#### General
+
+1. Cast expressions have the form:
+
+    ```ebnf
+    cast-expr ::=
+      upcast-expr
+      downcast-expr
+    
+    upcast-expr ::=
+      expr 'as' type-expr
+    
+    downcast-expr ::=
+      expr 'as!' type-expr
+    ```
+
+2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
+
+3. A cast expression whose left operand is escapable may be used  
+
+4. An upcast expression is well-formed if the type of the left operand is statically known to be subtype of the type denoted by the right operand. The result of an upcast expression `e` is an immutable projection of the left operand, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
+
+5. The evaluation of a downcast expression terminates the program at runtime if the dynamic type of its left operand is not subtype of the type denoted by the right operand. The result of a downcast expression `e` is a projection of the left operand, which may be immutable or mutable of its left operand is mutable, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
 
 https://val-qs97696.slack.com/archives/C035NEV54LE/p1647711237099869
 let b   = a as Int
