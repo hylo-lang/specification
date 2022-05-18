@@ -116,7 +116,7 @@ Val is a research language based on the principles of mutable value semantics (M
     decimal-fractional-constant ::= (token)
       decimal-literal '.' decimal-literal
 
-    exponent := (token)
+    exponent ::= (token)
       'e' exponent-sign? decimal-literal
       'E' exponent-sign? decimal-literal
 
@@ -180,7 +180,7 @@ Val is a research language based on the principles of mutable value semantics (M
       [^"\x0a\x0d]
 
     multiline-string ::= (token)
-      """ multiline-quoted-text """
+      '"""' multiline-quoted-text '"""'
 
     multiline-quoted-text ::= (token)
       multiline-quoted-text-item
@@ -595,7 +595,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. The *immediate sub-expressions* of an expression `e` are:
 
     1. the operands of `e`,
-    
+
     2. any function call that `e` implicitly invokes, or
 
     3. if `e` is a function call or implicitly invokes a function, the expression of each default argument used in the call.
@@ -2087,17 +2087,17 @@ Val is a research language based on the principles of mutable value semantics (M
     cast-expr ::=
       upcast-expr
       downcast-expr
-    
+
     upcast-expr ::=
       expr 'as' type-expr
-    
+
     downcast-expr ::=
       expr 'as!' type-expr
     ```
 
 2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
 
-3. A cast expression whose left operand is escapable may be used  
+3. A cast expression whose left operand is escapable may be used
 
 4. An upcast expression is well-formed if the type of the left operand is statically known to be subtype of the type denoted by the right operand. The result of an upcast expression `e` is an immutable projection of the left operand, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
 
