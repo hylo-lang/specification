@@ -114,7 +114,7 @@ Val is a research language based on the principles of mutable value semantics (M
       decimal-literal exponent
 
     decimal-fractional-constant ::= (token)
-      decimal-literal . decimal-literal
+      decimal-literal '.' decimal-literal
 
     exponent := (token)
       'e' exponent-sign? decimal-literal
@@ -178,7 +178,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     s-char ::= (regexp)
       [^"\x0a\x0d]
-      
+
     multiline-string ::= (token)
       """ multiline-quoted-text """
 
@@ -232,10 +232,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     identifier-tail ::= (regexp)
       [\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}]
-    
+
     bq-char ::= (regexp)
       [^`\x0a\x0d]
-      
+
     contextual-keyword ::= (one of)
       mutating size any
     ```
@@ -1290,7 +1290,7 @@ Val is a research language based on the principles of mutable value semantics (M
     3. A function declaration at type scope that does not contain a `static` modifier and is not declared with `init` or `memberwise init` is called a method declaration. It introduces one or more methods.
 
     4. A function declaration at type scope declared with `init` is called a *initializer* declaration. It introduces one global function.
-    
+
     5. A function declaration at type scope declared with `memberwise init` is called an *explicit memberwise initializer* declaration. In introduces one global function.
 
     6. A function declaration at type scope declared with `deinit` is called a deinitializer declaration. It introduces one sink method.
@@ -1495,7 +1495,7 @@ Val is a research language based on the principles of mutable value semantics (M
         fun[let self, sink var i = start]() {
           if i < self.count() {
             defer { i+= 1 }
-            return self[i].copy()   
+            return self[i].copy()
           } else {
             return nil
           }
@@ -2144,7 +2144,7 @@ sink e  = a as sink Int
     binding-pattern ::=
       binding-introducer pattern binding-annotation?
 
-    binding-introducer ::= 
+    binding-introducer ::=
       'let'
       'var'
       'sink'
