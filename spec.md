@@ -259,7 +259,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. An *entity* is an object, projection, function, subscript, property, trait, type, namespace, or module.
 
-2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a __decl__.
+2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a declaration.
 
 3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let`. are method names.
 
@@ -595,7 +595,6 @@ Val is a research language based on the principles of mutable value semantics (M
       binding-decl
       function-decl
       subscript-decl
-      property-decl
 
     import-statement ::=
       'import' identifier
@@ -697,19 +696,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## General
 
-1. Declarations have the form:
+1. A declaration may introduce one or more entities.
 
-    ```ebnf
-    decl ::=
-      product-type-decl
-      trait-decl
-      function-decl
-      binding-decl
-    ```
-
-2. A declaration may introduce one or more entities.
-
-3. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
+2. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
 ## Modifiers
 
@@ -1639,7 +1628,7 @@ Val is a research language based on the principles of mutable value semantics (M
       brace-stmt
       loop-stmt
       jump-stmt
-      decl
+      decl-stmt
       expr
     ```
 
@@ -1872,6 +1861,20 @@ Val is a research language based on the principles of mutable value semantics (M
 ### Continue statements
 
 1. Continue statements skip the remainder of a loop body. Control is transferred to the begin of the loop.
+
+## Declaration statements
+
+1. Declaration statements have the form:
+
+    ```ebnf
+    decl-stmt ::=
+      type-alias-decl
+      product-type-decl
+      extension-decl
+      conformance-decl
+      function-decl
+      subscript-decl
+    ```
 
 # Value expressions
 
