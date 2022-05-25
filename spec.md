@@ -2218,7 +2218,7 @@ sink e  = a as sink Int
 
 ### Asynchronous expressions
 
-1. Cast expressions have the form:
+1. Asynchronous expressions have the form:
 
     ```ebnf
     async-expr ::=
@@ -2227,10 +2227,10 @@ sink e  = a as sink Int
 
 ### Await expressions
 
-1. Cast expressions have the form:
+1. Await expressions have the form:
 
     ```ebnf
-    async-expr ::=
+    await-expr ::=
       'await' expr (',' expr)*
     ```
 
