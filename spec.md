@@ -697,9 +697,19 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## General
 
-1. A declaration may introduce one or more entities.
+1. Declarations have the form:
 
-2. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
+    ```ebnf
+    decl ::=
+      product-type-decl
+      trait-decl
+      function-decl
+      binding-decl
+    ```
+
+2. A declaration may introduce one or more entities.
+
+3. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
 ## Modifiers
 
@@ -2022,6 +2032,15 @@ Val is a research language based on the principles of mutable value semantics (M
       (identifier ':')? type-expr
     ```
 
+### Implicit member references
+
+1. Implicit member references have the form:
+
+    ```ebnf
+    implicit-member-ref ::=
+      '.' primary-decl-ref
+    ```
+
 ### Identifiers
 
 1. Identifiers have the form:
@@ -2178,7 +2197,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Binary expressions have the form:
 
     ```ebnf
-    assign-expr ::=
+    binary-expr ::=
       expr operator expr
     ```
 
@@ -2394,11 +2413,8 @@ sink e  = a as sink Int
     parameter-type-expr ::=
       parameter-passing-convention? type-expr
 
-    parameter-passing-convention ::=
-      let
-      inout
-      sink
-      yielded
+    parameter-passing-convention ::= (one of)
+      let inout sink yielded
     ```
 
 ## Stored projection type expressions
