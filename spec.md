@@ -213,8 +213,8 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     keyword ::= (one of)
       Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
-      false for fun if import in infix init inout let match namespace nil postfix prefix public return
-      set sink static true try type typealias var where while yielded
+      false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
+      return set sink static true try type typealias var where while yielded
     ```
 
 ### Identifiers
@@ -799,10 +799,16 @@ Val is a research language based on the principles of mutable value semantics (M
       size-constraint-expr
 
     equality-constraint ::=
-      type-name '==' type-expr
+      name-type-expr '==' type-expr
 
     conformance-constraint ::=
-      type-name ':' trait-composition
+      name-type-expr ':' trait-composition
+    
+    size-constraint-expr ::=
+      expr
+    
+    trait-composition ::=
+      name-type-expr ('&' name-type-expr)*
     ```
 
 2. A where clause specifies constraints on the generic parameters introduced by a generic signature, or the associated type requirements introduced by a trait declaration.
@@ -829,7 +835,7 @@ Val is a research language based on the principles of mutable value semantics (M
       access-modifier? 'trait' identifier trait-refinement-list
 
     trait-refinement-list ::=
-      ':' type-name (',' type-name)*
+      ':' name-type-expr (',' name-type-expr)*
 
     trait-body ::=
       '{' (trait-requirement-decl | ';')* '}'
@@ -1842,15 +1848,44 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## General
 
-1. An expression is a sequence of operators and operands that specifies a computation. An expression results in a value and may cause side effects.
+1. Value expressions have the form:
 
-2. If during the evaluation of an expression, the result is not mathematically defined or not in the range of representable values for its type, the behavior is undefined.
+    ```ebnf
+    expr ::=
+      prefix-expr
+    ```
 
-## Properties of expressions
+2. A value expression is a sequence of operators and operands that specifies a computation. A value expression results in a value and may cause side effects.
+
+3. If during the evaluation of a value expression, the result is not mathematically defined or not in the range of representable values for its type, the behavior is undefined.
+
+## Properties of value expressions
 
 ### Consuming expressions
 
-1. An expression is consuming if and only if its evaluation may end the lifetime of one or objects not created by the expression's evaluation.
+1. A value expression is consuming if and only if its evaluation may end the lifetime of one or objects not created by the expression's evaluation.
+
+## Prefix expressions
+
+1. Prefix expressions have the form:
+
+    ```ebnf
+    prefix-expr ::=
+      operator? suffix-expr
+    ``
+
+2. There shall be no whitespace between the operator and the operand of a prefix expression.
+
+## Suffix expressions
+
+1. Suffix expressions have the form:
+
+    ```ebnf
+    suffix-expr ::=
+      compound-expr operator?
+    ```
+
+2. There shall be no whitespace between the operator and the operand of a suffix expression.
 
 ## Primary expressions
 
@@ -1864,7 +1899,6 @@ Val is a research language based on the principles of mutable value semantics (M
       compound-literal
       primary-decl-ref
       implicit-member-ref
-      capture-expr
       lambda-expr
       async-expr
       await-expr
@@ -1930,7 +1964,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     map-literal ::=
-      '[' map-literal-component-list ']'
+      '[' map-component-list ']'
       '[' ':' ']'
 
     map-component-list ::=
@@ -1961,6 +1995,12 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     primary-decl-ref ::=
       identifier-expr type-argument-list?
+
+    type-argument-list ::=
+      '<' type-argument (',' type-argument)* '>'
+
+    type-argument ::=
+      (identifier ':')? type-expr
     ```
 
 ### Identifiers
@@ -2028,7 +2068,35 @@ Val is a research language based on the principles of mutable value semantics (M
     let g = Vector2.scaled(by:).sink // OK
     ```
 
+### Tuple expressions
+
+1. Tuple expressions have the form:
+
+    ```ebnf
+    tuple-expr ::=
+      '(' tuple-expr-element-list ')'
+
+    tuple-expr-element-list ::=
+      tuple-expr-element (',' tuple-expr-element)?
+    
+    tuple-expr-element ::=
+      (identifier ':')? expr
+    ```
+
 ## Compound expressions
+
+### General
+
+1. Compound expressions have the form:
+
+    ```ebnf
+    compound-expr ::=
+      value-member-expr
+      function-call-expr
+      subscript-call-expr
+      binary-expr
+      cast-expr
+    ```
 
 ### Member accesses
 
@@ -2053,11 +2121,11 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Function calls have the form:
 
     ```ebnf
-    call-expr ::=
+    function-call-expr ::=
       expr '(' call-argument-list? ')'
 
     call-argument-list ::=
-      call-argument ( ',' call-argument )*
+      call-argument (',' call-argument)*
 
     call-argument ::=
       (identifier ':')? expr
@@ -2076,6 +2144,26 @@ Val is a research language based on the principles of mutable value semantics (M
     4. otherwise, the call expression is a function call.
 
 3. Arguments to `sink` parameters are consumed. Arguments to `let` parameters are projected immutably in the entire call expression. Arguments to `inout` and `set` parameters are projected mutably in the entire call expression.
+
+### Subscript calls
+
+1. Subscript calls have the form:
+
+    ```ebnf
+    subscript-call-expr ::=
+      expr '[' call-argument-list? ']'
+    ```
+
+### Binary expressions
+
+1. Binary expressions have the form:
+
+    ```ebnf
+    assign-expr ::=
+      expr operator expr
+    ```
+
+2. There must be at least one whitespace on either side of the operator.
 
 ### Casts
 
@@ -2109,6 +2197,80 @@ inout c = a as inout Int
 var d   = a as var Int
 sink e  = a as sink Int
 
+### Asynchronous expressions
+
+1. Cast expressions have the form:
+
+    ```ebnf
+    async-expr ::=
+      'async' expr
+    ```
+
+### Await expressions
+
+1. Cast expressions have the form:
+
+    ```ebnf
+    async-expr ::=
+      'await' expr (',' expr)*
+    ```
+
+### Lambda expressions
+
+1. Lambda expressions have the form:
+
+    ```ebnf
+    lambda-expr ::=
+      'fun' capture-list? function-signature lambda-body
+
+    lambda-body ::=
+      brace-stmt
+    ```
+
+2. The parameters of a lambda expressions may not have a default value.
+
+### Selection expressions
+
+1. Selection expressions have the form:
+
+    ```ebnf
+    selection-expr ::=
+      conditional-expr
+      match-expr
+    ```
+
+#### Conditional expressions
+
+1. Conditional expressions have the form:
+
+    ```ebnf
+    conditional-expr ::=
+      'if' conditional-clause brace-stmt conditional-tail?
+
+    conditional-clause ::=
+      conditional-clause-item (',' conditional-clause-item)*
+    
+    conditional-clause-item ::=
+      binding-pattern
+      expr
+    
+    conditional-tail ::=
+      'else' conditional-expr
+      'else' brace-stmt
+    ```
+
+#### Match expressions
+
+1. Match expressions have the form:
+
+    ```ebnf
+    match-expr ::=
+      'match' expr '{' (match-case | ';')* '}'
+    
+    match-case ::=
+      pattern brace-stmt
+    ```
+
 ## Operators
 
 ### Operator notations
@@ -2122,19 +2284,169 @@ sink e  = a as sink Int
 
 # Type expressions
 
-## Tuple types
+1. Type expressions have the form:
 
-1. A tuple type is a structural type composed of zero or more ordered *operands*. An operand is a type together with an optional label.
+    ```ebnf
+    type-expr ::=
+      async-type-expr
+      conformance-lens-type-expr
+      existential-type-expr
+      indirect-type-expr
+      lambda-type-expr
+      name-type-expr
+      parameter-type-expr
+      stored-projection-type-expr
+      tuple-type-expr
+      wildcard-type-expr
+    ```
 
-## Function and lambda types
+## Asnychronous type expressions
 
-## Union types
+1. Asynchronous type expressions have the form:
 
-## Existential types
+    ```ebnf
+    async-type-expr ::=
+      'async' type-expr
+    ```
+
+## Conformance lenses
+
+1. Conformance lenses have the form:
+
+    ```ebnf
+    conformance-lens-type-expr ::=
+      type-expr '::' type-identifier
+    ```
+
+## Existential type expressions
+
+1. Existential type expressions have the form:
+
+    ```ebnf
+    existential-type-expr ::=
+      'any' trait-composition where-clause?
+    ```
+
+## Indirect type expressions
+
+1. Indirect type expressions have the form:
+
+    ```ebnf
+    indirect-type-expr ::=
+      'indirect' type-expr
+    ```
+
+## Lambda type expressions
+
+1. Lambda type expressions have the form:
+
+    ```ebnf
+    lambda-type-expr ::=
+      lamda-parameter-list '->' lambda-receiver-effect? type-expr
+    
+    lamda-parameter-list ::=
+      '(' lambda-parameter (',' lambda-parameter)* ')'
+
+    lambda-parameter ::=
+      (identifier ':')? type-expr
+
+    lambda-receiver-effect ::=
+      inout
+      sink
+    ```
+
+## Name type expressions
+
+1. Name type expressions have the form:
+
+    ```ebnf
+    name-type-expr ::=
+      type-expr '.' type-identifier type-argument-list?
+
+    type-identifier ::=
+      identifier
+    ```
+
+## Parameter type expressions
+
+1. Parameter type expressions have the form:
+
+    ```ebnf
+    parameter-type-expr ::=
+      parameter-passing-convention? type-expr
+
+    parameter-passing-convention ::=
+      let
+      inout
+      sink
+      yielded
+    ```
+
+## Stored projection type expressions
+
+1. Stored projection type expressions have the form:
+
+    ```ebnf
+    stored-projection-type-expr ::=
+      '[' stored-projection-capability type-expr ']'
+    
+    stored-projection-capability ::=
+      'let'
+      'inout'
+      'yielded'
+    ```
+
+## Tuple type expressions
+
+1. Tuple type expressions have the form:
+
+    ```ebnf
+    tuple-type-expr ::=
+      '(' tuple-type-element-list ')'
+
+    tuple-type-element-list ::=
+      tuple-type-element (',' tuple-type-element)?
+    
+    tuple-type-element ::=
+      (identifier ':')? type-expr
+    ```
+
+2. A tuple type is a structural type composed of zero or more ordered *operands*. An operand is a type together with an optional label.
+
+## Union type expressions
+
+1. Union type expressions have the form:
+
+    ```ebnf
+    union-type-expr ::=
+      type-expr ('|' type-expr)+
+    ```
+
+## Wildcard type expressions
+
+1. Wildcard type expressions have the form:
+
+    ```ebnf
+    wildcard-type-expr ::=
+      '_'
+    ```
 
 ## Type aliases
 
 # Patterns
+
+## General
+
+1. Patterns have the form:
+
+    ```ebnf
+    pattern ::=
+      binding-pattern
+      expr-pattern
+      name-pattern
+      tuple-pattern
+      wildcard-pattern
+    ```
 
 ## Binding patterns
 
@@ -2152,4 +2464,46 @@ sink e  = a as sink Int
 
     binding-annotation ::=
       ':' type-expr
+    ```
+
+## Expression patterns
+
+1. Expression patterns have the form:
+
+    ```ebnf
+    expr-pattern ::=
+      expr
+    ```
+
+## Name patterns
+
+1. Name patterns have the form:
+
+    ```ebnf
+    name-pattern ::=
+      identifier
+    ```
+
+## Tuple patterns
+
+1. Tuple patterns have the form:
+
+    ```ebnf
+    tuple-pattern ::=
+      '(' tuple-pattern-element-list ')'
+
+    tuple-pattern-element-list ::=
+      tuple-pattern-element (',' tuple-pattern-element)?
+    
+    tuple-pattern-element ::=
+      (identifier ':')? pattern
+    ```
+
+## Wildcard patterns
+
+1. Wildcard patterns have the form:
+
+    ```ebnf
+    wildcard-pattern ::=
+      '_'
     ```
