@@ -822,10 +822,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     conformance-constraint ::=
       name-type-expr ':' trait-composition
-    
+
     size-constraint-expr ::=
       expr
-    
+
     trait-composition ::=
       name-type-expr ('&' name-type-expr)*
     ```
@@ -1891,7 +1891,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     prefix-expr ::=
       operator? suffix-expr
-    ``
+    ```
 
 2. There shall be no whitespace between the operator and the operand of a prefix expression.
 
@@ -2097,7 +2097,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     tuple-expr-element-list ::=
       tuple-expr-element (',' tuple-expr-element)?
-    
+
     tuple-expr-element ::=
       (identifier ':')? expr
     ```
@@ -2268,11 +2268,11 @@ sink e  = a as sink Int
 
     conditional-clause ::=
       conditional-clause-item (',' conditional-clause-item)*
-    
+
     conditional-clause-item ::=
       binding-pattern
       expr
-    
+
     conditional-tail ::=
       'else' conditional-expr
       'else' brace-stmt
@@ -2285,7 +2285,7 @@ sink e  = a as sink Int
     ```ebnf
     match-expr ::=
       'match' expr '{' (match-case | ';')* '}'
-    
+
     match-case ::=
       pattern brace-stmt
     ```
@@ -2362,7 +2362,7 @@ sink e  = a as sink Int
     ```ebnf
     lambda-type-expr ::=
       lamda-parameter-list '->' lambda-receiver-effect? type-expr
-    
+
     lamda-parameter-list ::=
       '(' lambda-parameter (',' lambda-parameter)* ')'
 
@@ -2408,7 +2408,7 @@ sink e  = a as sink Int
     ```ebnf
     stored-projection-type-expr ::=
       '[' stored-projection-capability type-expr ']'
-    
+
     stored-projection-capability ::=
       'let'
       'inout'
@@ -2425,7 +2425,7 @@ sink e  = a as sink Int
 
     tuple-type-element-list ::=
       tuple-type-element (',' tuple-type-element)?
-    
+
     tuple-type-element ::=
       (identifier ':')? type-expr
     ```
@@ -2513,7 +2513,7 @@ sink e  = a as sink Int
 
     tuple-pattern-element-list ::=
       tuple-pattern-element (',' tuple-pattern-element)?
-    
+
     tuple-pattern-element ::=
       (identifier ':')? pattern
     ```
