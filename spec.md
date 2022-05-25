@@ -2391,9 +2391,8 @@ sink e  = a as sink Int
     lambda-parameter ::=
       (identifier ':')? type-expr
 
-    lambda-receiver-effect ::=
-      inout
-      sink
+    lambda-receiver-effect ::= (one of)
+      inout sink
     ```
 
 ## Name type expressions
