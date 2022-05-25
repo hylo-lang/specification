@@ -580,7 +580,26 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Modules
 
-1. A Val program organizes code into *modules*. A module is a collection of declarations.
+1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements.  Modules have the form:
+
+    ```ebnf
+    module-definition ::=
+      ( module-scope-decl | import-statement )*
+
+    module-scope-decl ::=
+      trait-decl
+      type-alias-decl
+      product-type-decl
+      extension-decl
+      conformance-decl
+      binding-decl
+      function-decl
+      subscript-decl
+      property-decl
+
+    import-statement ::=
+      'import' identifier
+    ```
 
 2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> ()`. A program shall contain exactly one entry module.
 
