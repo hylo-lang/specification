@@ -166,11 +166,7 @@ Val is a research language based on the principles of mutable value semantics (M
       multiline-string
 
     simple-string ::= (token)
-      '"' simple-quoted-text? '"'
-
-    simple-quoted-text ::= (token)
-      simple-quoted-text-item
-      simple-quoted-text simple-quoted-text-item
+      '"' simple-quoted-text-item* '"'
 
     simple-quoted-text-item ::=
       escape-char
@@ -180,11 +176,7 @@ Val is a research language based on the principles of mutable value semantics (M
       [^"\x0a\x0d]
 
     multiline-string ::= (token)
-      '"""' multiline-quoted-text '"""'
-
-    multiline-quoted-text ::= (token)
-      multiline-quoted-text-item
-      multiline-quoted-text multiline-quoted-text-item
+      '"""' multiline-quoted-text-item+ '"""'
 
     multiline-quoted-text-item ::=
       escape-char
