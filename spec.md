@@ -202,7 +202,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. The following keywords are reserved identifiers.
 
-    ```ebnf
+    ```
     Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
     false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
     return set sink static true try type typealias var where while yielded
