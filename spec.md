@@ -200,13 +200,12 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ### Keywords
 
-1. Keywords are reserved identifiers. They have the form:
+1. The following keywords are reserved identifiers.
 
     ```ebnf
-    keyword ::= (one of)
-      Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
-      false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
-      return set sink static true try type typealias var where while yielded
+    Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
+    false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
+    return set sink static true try type typealias var where while yielded
     ```
 
 ### Identifiers
@@ -1942,6 +1941,7 @@ Val is a research language based on the principles of mutable value semantics (M
       integer-literal
       floating-point-literal
       string-literal
+      unicode-scalar-literal
     ```
 
 ### Compound literals
@@ -2129,6 +2129,7 @@ Val is a research language based on the principles of mutable value semantics (M
       subscript-call-expr
       binary-expr
       cast-expr
+      primary-expr
     ```
 
 ### Member accesses
@@ -2330,6 +2331,7 @@ sink e  = a as sink Int
       parameter-type-expr
       stored-projection-type-expr
       tuple-type-expr
+      union-type-expr
       wildcard-type-expr
     ```
 
