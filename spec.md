@@ -207,7 +207,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```
     Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
     false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
-    return set sink static true try type typealias var where while yielded
+    return set sink some static true try type typealias var where while yielded
     ```
 
 ### Identifiers
@@ -537,7 +537,7 @@ Val is a research language based on the principles of mutable value semantics (M
     }
 
     fun main() {
-      let comparator = Int.<
+      let comparator = Int.infix<
       let (x, y) = (2, 3)
       let z = min[x, y, by: comparator]
         // 'z' projects both 'x' and 'y', but not 'comparator'
@@ -580,6 +580,7 @@ Val is a research language based on the principles of mutable value semantics (M
       ( module-scope-decl | import-statement )*
 
     module-scope-decl ::=
+      namespace-decl
       trait-decl
       type-alias-decl
       product-type-decl
@@ -826,6 +827,21 @@ Val is a research language based on the principles of mutable value semantics (M
     2. A conformance constraint specifies that the type denoted by the left hand side of `:` be conforming to the traits specified in __trait-composition__.
 
     3. A size constraint is an expression denoting a predicate over one or more size parameters. It must be an expression of type `Bool` and shall only refer to names introduced in global scopes or size parameters.
+
+## Namespace declarations
+
+1. Namespace declarations have the form:
+
+    ```ebnf
+    namespace-decl ::=
+      namespace-head namespace-body
+
+    namespace-head ::=
+      access-modifier? 'namespace' identifier
+
+    namespace-body ::=
+      '{' module-scope-decl* '}'
+    ```
 
 ## Trait declarations
 
@@ -1355,7 +1371,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```val
     fun factorial(_ n: Int) -> Int {
-      if n > 0 { n * factorial(n - 1) else { 1 } }
+      if n > 0 { n * factorial(n - 1) } else { 1 }
     }
     ```
 
@@ -1506,7 +1522,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```val
     extension Array where Element: Copyable {
 
-      subscript generator(from start: Int): var [some] () inout -> Maybe<Element> {
+      subscript generator(from start: Int): var [some _] () inout -> Maybe<Element> {
         fun[let self, sink var i = start]() {
           if i < self.count() {
             defer { i+= 1 }
@@ -1575,7 +1591,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     parameter-list ::=
-      parameter-decl (',' parameter-decl)?
+      parameter-decl (',' parameter-decl)*
 
     parameter-decl ::=
       (identifier | '_') identifier? (':' parameter-type-expr)? default-value?
@@ -1678,11 +1694,13 @@ Val is a research language based on the principles of mutable value semantics (M
 3. (Example)
 
     ```val
-    var counter = 0
-    do {
-      counter += 1
-      let x = counter
-    } while x < 3
+    fun main() {
+      var counter = 0
+      do {
+        counter += 1
+        let x = counter
+      } while x < 3
+    }
     ```
 
     The binding `x` that occurrs in the condition of the `do-while` statement is declared in it its body.
@@ -1701,7 +1719,7 @@ Val is a research language based on the principles of mutable value semantics (M
       while-condition-item (',' while-condition-item)*
 
     while-condition-item ::=
-      binding-pattern
+      binding-pattern '=' expr
       expr
     ```
 
@@ -1774,7 +1792,7 @@ Val is a research language based on the principles of mutable value semantics (M
       var things: Array<Any> = [1, "abc", 3, 2]
       var iterator = things.make_iterator()
       while true {
-        if inout x: Int = iterator.next() where x < 3 {
+        if inout x: Int = iterator.next(), x < 3 {
           x += 1
         } else {
           break
@@ -1868,6 +1886,7 @@ Val is a research language based on the principles of mutable value semantics (M
       conformance-decl
       function-decl
       subscript-decl
+      binding-decl
     ```
 
 # Value expressions
@@ -1878,7 +1897,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     expr ::=
-      prefix-expr
+      prefix-expr infix-tail?
     ```
 
 2. A value expression is a sequence of operators and operands that specifies a computation. A value expression results in a value and may cause side effects.
@@ -1891,13 +1910,41 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. A value expression is consuming if and only if its evaluation may end the lifetime of one or objects not created by the expression's evaluation.
 
+## Infix expressions
+
+1. Infix tails have the form:
+
+    ```ebnf
+    infix-tail ::=
+      infix-item+
+
+    infix-item ::=
+      infix-operator prefix-expr
+      type-casting-operator type-expr
+
+    infix-operator ::=
+      operator
+      '='
+      '=='
+      '<'
+      '>'
+      '..<'
+      '...'
+    ```
+
 ## Prefix expressions
 
 1. Prefix expressions have the form:
 
     ```ebnf
     prefix-expr ::=
-      operator? suffix-expr
+      prefix-operator? suffix-expr
+
+    prefix-operator ::=
+      operator
+      'async'
+      'await'
+      '&'
     ```
 
 2. There shall be no whitespace between the operator and the operand of a prefix expression.
@@ -1908,10 +1955,12 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     suffix-expr ::=
-      compound-expr operator?
+      primary-expr
+      compound-expr
+      suffix-expr operator
     ```
 
-2. There shall be no whitespace between the operator and the operand of a suffix expression.
+1. There shall be no whitespace between the operator and the operand of a suffix expression.
 
 ## Primary expressions
 
@@ -1926,8 +1975,6 @@ Val is a research language based on the principles of mutable value semantics (M
       primary-decl-ref
       implicit-member-ref
       lambda-expr
-      async-expr
-      await-expr
       selection-expr
       tuple-expr
       'nil'
@@ -2130,8 +2177,6 @@ Val is a research language based on the principles of mutable value semantics (M
       value-member-expr
       function-call-expr
       subscript-call-expr
-      binary-expr
-      cast-expr
       primary-expr
     ```
 
@@ -2191,67 +2236,6 @@ Val is a research language based on the principles of mutable value semantics (M
       expr '[' call-argument-list? ']'
     ```
 
-### Binary expressions
-
-1. Binary expressions have the form:
-
-    ```ebnf
-    binary-expr ::=
-      expr operator expr
-    ```
-
-2. There must be at least one whitespace on either side of the operator.
-
-### Casts
-
-#### General
-
-1. Cast expressions have the form:
-
-    ```ebnf
-    cast-expr ::=
-      upcast-expr
-      downcast-expr
-
-    upcast-expr ::=
-      expr 'as' type-expr
-
-    downcast-expr ::=
-      expr 'as!' type-expr
-    ```
-
-2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
-
-3. A cast expression whose left operand is escapable may be used
-
-4. An upcast expression is well-formed if the type of the left operand is statically known to be subtype of the type denoted by the right operand. The result of an upcast expression `e` is an immutable projection of the left operand, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
-
-5. The evaluation of a downcast expression terminates the program at runtime if the dynamic type of its left operand is not subtype of the type denoted by the right operand. The result of a downcast expression `e` is a projection of the left operand, which may be immutable or mutable of its left operand is mutable, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
-
-https://val-qs97696.slack.com/archives/C035NEV54LE/p1647711237099869
-let b   = a as Int
-inout c = a as inout Int
-var d   = a as var Int
-sink e  = a as sink Int
-
-### Asynchronous expressions
-
-1. Asynchronous expressions have the form:
-
-    ```ebnf
-    async-expr ::=
-      'async' expr
-    ```
-
-### Await expressions
-
-1. Await expressions have the form:
-
-    ```ebnf
-    await-expr ::=
-      'await' expr (',' expr)*
-    ```
-
 ### Lambda expressions
 
 1. Lambda expressions have the form:
@@ -2288,7 +2272,7 @@ sink e  = a as sink Int
       conditional-clause-item (',' conditional-clause-item)*
 
     conditional-clause-item ::=
-      binding-pattern
+      binding-pattern '=' expr
       expr
 
     conditional-tail ::=
@@ -2319,6 +2303,33 @@ sink e  = a as sink Int
       infix prefix postfix
     ```
 
+### Type casting operators
+
+1. Type casting operators have the form:
+
+    ```ebnf
+    type-casting-operator ::= (one of)
+      as as! _as!!
+    ```
+
+2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
+
+3. A cast expression whose left operand is escapable may be used
+
+4. An upcast expression is well-formed if the type of the left operand is statically known to be subtype of the type denoted by the right operand. The result of an upcast expression `e` is an immutable projection of the left operand, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
+
+5. The evaluation of a downcast expression terminates the program at runtime if the dynamic type of its left operand is not subtype of the type denoted by the right operand. The result of a downcast expression `e` is a projection of the left operand, which may be immutable or mutable of its left operand is mutable, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
+
+https://val-qs97696.slack.com/archives/C035NEV54LE/p1647711237099869
+let b   = a as Int
+inout c = a as inout Int
+var d   = a as var Int
+sink e  = a as sink Int
+
+### Async operator
+
+### Await operator
+
 # Type expressions
 
 1. Type expressions have the form:
@@ -2326,8 +2337,10 @@ sink e  = a as sink Int
     ```ebnf
     type-expr ::=
       async-type-expr
+      buffer-type-expr
       conformance-lens-type-expr
       existential-type-expr
+      opaque-type-expr
       indirect-type-expr
       lambda-type-expr
       name-type-expr
@@ -2337,13 +2350,22 @@ sink e  = a as sink Int
       wildcard-type-expr
     ```
 
-## Asnychronous type expressions
+## Asynchronous type expressions
 
 1. Asynchronous type expressions have the form:
 
     ```ebnf
     async-type-expr ::=
       'async' type-expr
+    ```
+
+## Buffer type expressions
+
+1. Buffer type expressions have the form:
+
+    ```ebnf
+    buffer-type-expr ::=
+      type-expr '[' expr? ']'
     ```
 
 ## Conformance lenses
@@ -2364,6 +2386,16 @@ sink e  = a as sink Int
       'any' trait-composition where-clause?
     ```
 
+## Opaque type expressions
+
+1. Opaque type expressions have the form:
+
+    ```ebnf
+    opaque-type-expr ::=
+      'some' trait-composition where-clause?
+      'some' '_'
+    ```
+
 ## Indirect type expressions
 
 1. Indirect type expressions have the form:
@@ -2379,10 +2411,13 @@ sink e  = a as sink Int
 
     ```ebnf
     lambda-type-expr ::=
-      lamda-parameter-list '->' lambda-receiver-effect? type-expr
+      lambda-environment? '(' lamda-parameter-list? ')' lambda-receiver-effect? '->' type-expr
+
+    lambda-environment ::=
+      '[' type-expr ']'
 
     lamda-parameter-list ::=
-      '(' lambda-parameter (',' lambda-parameter)* ')'
+      lambda-parameter (',' lambda-parameter)*
 
     lambda-parameter ::=
       (identifier ':')? type-expr
