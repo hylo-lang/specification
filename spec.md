@@ -1038,7 +1038,7 @@ Val is a research language based on the principles of mutable value semantics (M
       product-type-head product-type-body
 
     product-type-head ::=
-      access-modifier? identifier generic-clause? conformance-list
+      access-modifier? 'type' identifier generic-clause? conformance-list?
 
     product-type-body ::=
       '{' (product-type-member-decl | ';')* '}'
