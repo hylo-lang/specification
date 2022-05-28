@@ -195,7 +195,9 @@ Val is a research language based on the principles of mutable value semantics (M
         Hello,
         World!
       """
-    print(s) // "  Hello,\n  World!"
+    fun main() { 
+      print(s) // "  Hello,\n  World!"
+    }
     ```
 
 ### Keywords
