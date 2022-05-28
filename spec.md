@@ -2328,7 +2328,6 @@ sink e  = a as sink Int
       indirect-type-expr
       lambda-type-expr
       name-type-expr
-      parameter-type-expr
       stored-projection-type-expr
       tuple-type-expr
       union-type-expr
