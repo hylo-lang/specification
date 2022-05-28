@@ -993,7 +993,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     // declares and satisfies conformance to 'U'
     conformance A: U {
-      publc fun bar() {}
+      public fun bar() {}
     }
     ```
 
