@@ -230,7 +230,7 @@ Val is a research language based on the principles of mutable value semantics (M
       [^`\x0a\x0d]
 
     contextual-keyword ::= (one of)
-      mutating size any
+      mutating size any in
     ```
 
 2. Contextual keywords are identifiers that have a special meaning when appearing in a certain context. When referred to in the grammar, these identifiers are used explicitly rather than using the identifier grammar production.
