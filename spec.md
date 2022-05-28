@@ -1369,17 +1369,17 @@ Val is a research language based on the principles of mutable value semantics (M
 
 4. The declaration of a method `m` that contains an explicit `inout` method implementation is automatically provided with a synthesized `sink` method implementation, defined as follows:
 
-    ```val
+    ```val no-parse
     sink {
       sink var this = self
-      this.=m(arg1, ..., argn)
+      &this.m(arg1, ..., argn)
       return this
     }
     ```
 
 5. The declaration of a method `m` that contains an explicit `sink` method implementation is automatically provided with a synthesized `inout` method implementation, defined as follows:
 
-    ```val
+    ```val no-parse
     inout {
       self = m(arg1, ..., argn)
     }
