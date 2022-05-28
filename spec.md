@@ -195,7 +195,7 @@ Val is a research language based on the principles of mutable value semantics (M
         Hello,
         World!
       """
-    fun main() { 
+    fun main() {
       print(s) // "  Hello,\n  World!"
     }
     ```
@@ -1580,7 +1580,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     property-head ::=
       member-modifier* 'property' identifier
-    
+
     property-annotation ::=
       ':' type-expr
     ```
