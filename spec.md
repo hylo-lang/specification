@@ -513,7 +513,7 @@ Val is a research language based on the principles of mutable value semantics (M
 5. (Example)
 
     ```val
-    type A { fun zero: Int { 0 } }
+    type A { property zero: Int { 0 } }
 
     fun main() {
       let x = A()
@@ -758,7 +758,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     conformance-list ::=
-      ':' type-identifier (',' type-identifier)*
+      ':' name-type-expr (',' name-type-expr)*
     ```
 
 ## Generic clauses
@@ -774,10 +774,7 @@ Val is a research language based on the principles of mutable value semantics (M
       generic-size-parameter
 
     generic-type-parameter ::=
-      generic-type-parameter-identifier trait-annotation?
-
-    generic-type-parameter-identifier ::= (token)
-      identifier '...'?
+      identifier '...'? trait-annotation?
 
     trait-annotation ::=
       ':' trait-composition
@@ -841,7 +838,7 @@ Val is a research language based on the principles of mutable value semantics (M
       trait-head trait-body
 
     trait-head ::=
-      access-modifier? 'trait' identifier trait-refinement-list
+      access-modifier? 'trait' identifier trait-refinement-list?
 
     trait-refinement-list ::=
       ':' name-type-expr (',' name-type-expr)*
@@ -1016,7 +1013,7 @@ Val is a research language based on the principles of mutable value semantics (M
     import M
 
     public type A {}
-    conformance A: M.T    // OK: conformance is private
+    conformance A: M.T {} // OK: conformance is private
 
     type B: M.T {}        // OK: 'B' is not exposed outside of the module
 
@@ -1036,7 +1033,7 @@ Val is a research language based on the principles of mutable value semantics (M
       product-type-head product-type-body
 
     product-type-head ::=
-      access-modifier? identifier generic-clause? conformance-list
+      access-modifier? 'type' identifier generic-clause? conformance-list?
 
     product-type-body ::=
       '{' (product-type-member-decl | ';')* '}'
@@ -1044,6 +1041,7 @@ Val is a research language based on the principles of mutable value semantics (M
     product-type-member-decl ::=
       function-decl
       subscript-decl
+      property-decl
       binding-decl
       product-type-decl
       type-alias-decl
@@ -1110,7 +1108,7 @@ Val is a research language based on the principles of mutable value semantics (M
       conformance-head conformance-body
 
     conformance-head ::=
-      access-modifier? 'conformance' type-expr ':' conformance-list where-clause?
+      access-modifier? 'conformance' type-expr conformance-list where-clause?
 
     conformance-body ::=
       '{' (conformance-member-decl | ';')* '}'
@@ -1506,7 +1504,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```val
     extension Array where Element: Copyable {
 
-      subscript generator(from start: Int): var mutating [some] () -> Maybe<Element> {
+      subscript generator(from start: Int): var [some] () inout -> Maybe<Element> {
         fun[let self, sink var i = start]() {
           if i < self.count() {
             defer { i+= 1 }
@@ -1560,10 +1558,13 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     property-decl ::=
-      property-head subscript-body
+      property-head property-annotation subscript-body
 
     property-head ::=
       member-modifier* 'property' identifier
+    
+    property-annotation ::=
+      ':' type-expr
     ```
 
 ## Parameter declarations
@@ -1742,7 +1743,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```val
     fun main() {
-      for let x in 0 until x { print(x) }
+      for let x in 0 ..< x { print(x) }
     }
     ```
 
@@ -1826,7 +1827,7 @@ Val is a research language based on the principles of mutable value semantics (M
 2. (Example)
 
     ```val
-    subscript element<A>(at: index, in array: Array<A>): T {
+    subscript element<A>(at index: Int, in array: Array<A>): T {
       print("will yield")
       yield array[position]
       if a > b { yield a } else { yield b }
@@ -2395,7 +2396,7 @@ sink e  = a as sink Int
 
     ```ebnf
     name-type-expr ::=
-      type-expr '.' type-identifier type-argument-list?
+      (type-expr '.')? type-identifier type-argument-list?
 
     type-identifier ::=
       identifier
