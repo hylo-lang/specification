@@ -2397,6 +2397,7 @@ sink e  = a as sink Int
     ```ebnf
     name-type-expr ::=
       type-expr '.' type-identifier type-argument-list?
+      type-identifier
 
     type-identifier ::=
       identifier
