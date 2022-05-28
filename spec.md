@@ -215,10 +215,13 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Identifiers are case-sensitive sequences of letters and digits. They have the form:
 
     ```ebnf
-    identifier ::= (token)
+    identifier ::=
+      identifier-token
+      contextual-keyword
+
+    identifier-token ::= (token)
       identifier-head identifier-tail*
       '`' bq-char+ '`'
-      contextual-keyword
 
     identifier-head ::= (regexp)
       [_\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}]
