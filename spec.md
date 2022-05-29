@@ -1958,7 +1958,6 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     suffix-expr ::=
-      primary-expr
       compound-expr
       suffix-expr operator
     ```
@@ -2514,7 +2513,6 @@ sink e  = a as sink Int
     pattern ::=
       binding-pattern
       expr-pattern
-      name-pattern
       tuple-pattern
       wildcard-pattern
     ```
@@ -2525,7 +2523,7 @@ sink e  = a as sink Int
 
     ```ebnf
     binding-pattern ::=
-      binding-introducer pattern binding-annotation?
+      binding-introducer (tuple-pattern | wildcard-pattern | identifier) binding-annotation?
 
     binding-introducer ::=
       'let'
@@ -2544,15 +2542,6 @@ sink e  = a as sink Int
     ```ebnf
     expr-pattern ::=
       expr
-    ```
-
-## Name patterns
-
-1. Name patterns have the form:
-
-    ```ebnf
-    name-pattern ::=
-      identifier
     ```
 
 ## Tuple patterns
