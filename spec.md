@@ -580,7 +580,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     module-definition ::=
-      ( module-scope-decl | import-statement )*
+      whitespace-opt ( module-scope-decl | import-statement )* whitespace-opt
 
     module-scope-decl ::=
       namespace-decl
@@ -1812,10 +1812,10 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Jump statements unconditionally transfer control. They have the form:
 
     ```ebnf
-    jump-stmt ::= (no-newline)
+    jump-stmt ::= (no-whitespace)
       cond-binding-stmt
-      'return' expr?
-      'yield' expr
+      'return' horizontal-space-opt expr?
+      'yield' horizontal-space-opt expr
       'break'
       'continue'
     ```
@@ -2566,4 +2566,35 @@ sink e  = a as sink Int
     ```ebnf
     wildcard-pattern ::=
       '_'
+    ```
+
+## Whitespace and comments
+
+    ```ebnf
+    whitespace-opt ::= (no-whitespace)
+      (horizontal-space | newlines)*
+
+    horizontal-space-opt ::= (no-whitespace)
+      horizontal-space*
+
+    horizontal-space ::=
+      hspace
+      single-line-comment
+      block-comment
+
+    hspace ::= (regexp)
+      \h+
+
+    single-line-comment ::= (regexp)
+      //\V*
+
+    block-comment ::= (no-whitespace)
+      block-comment-open '*/'
+      block-comment-open block-comment '*/'
+
+    block-comment-open ::= (regexp)
+      /[*](?:[^*/]|(?:[*][^/])|(?:/[^*]))*
+
+    newlines ::= (regexp)
+      \R+
     ```
