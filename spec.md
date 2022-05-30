@@ -1812,7 +1812,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Jump statements unconditionally transfer control. They have the form:
 
     ```ebnf
-    jump-stmt ::=
+    jump-stmt ::= (no-newline)
       cond-binding-stmt
       'return' expr?
       'yield' expr
@@ -1940,7 +1940,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Prefix expressions have the form:
 
     ```ebnf
-    prefix-expr ::=
+    prefix-expr ::= (no-whitespace)
       prefix-operator? suffix-expr
 
     prefix-operator ::=
@@ -1957,7 +1957,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Suffix expressions have the form:
 
     ```ebnf
-    suffix-expr ::=
+    suffix-expr ::= (no-whitespace)
       compound-expr
       suffix-expr operator
     ```
