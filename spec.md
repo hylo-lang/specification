@@ -1657,7 +1657,15 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     brace-stmt ::=
-      '{' (stmt | ';')* '}'
+      '{' stmt-list? '}'
+
+    stmt-list ::= (no-whitespace)
+      stmt
+      stmt-list stmt-separator stmt
+
+    stmt-separator ::= (no-whitespace)
+      horizontal-space-opt (newlines horizontal-space-opt)*
+      whitespace-opt (';' whitespace-opt)*
     ```
 
 3. The statements contained in a brace statements are called its sub-statements.
