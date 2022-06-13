@@ -579,8 +579,11 @@ Val is a research language based on the principles of mutable value semantics (M
 1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements.  Modules have the form:
 
     ```ebnf
-    module-definition ::=
-      whitespace-opt ( module-scope-decl | import-statement )* whitespace-opt
+    module-definition ::= (no-whitespace)
+      whitespace-opt module-body whitespace-opt
+
+    module-body ::=
+      ( module-scope-decl | import-statement )*
 
     module-scope-decl ::=
       namespace-decl
