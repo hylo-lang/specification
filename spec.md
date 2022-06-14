@@ -2226,7 +2226,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Function calls have the form:
 
     ```ebnf
-    function-call-expr ::=
+    function-call-expr ::= (no-whitespace)
       expr '(' call-argument-list? ')'
 
     call-argument-list ::=
@@ -2255,7 +2255,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Subscript calls have the form:
 
     ```ebnf
-    subscript-call-expr ::=
+    subscript-call-expr ::= (no-whitespace)
       expr '[' call-argument-list? ']'
     ```
 
