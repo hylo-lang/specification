@@ -1642,6 +1642,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     stmt ::=
       brace-stmt
+      discard-stmt
       loop-stmt
       jump-stmt
       decl-stmt
@@ -1674,6 +1675,15 @@ Val is a research language based on the principles of mutable value semantics (M
 3. The statements contained in a brace statements are called its sub-statements.
 
 4. Control enters the lexical scope of a brace statement before executing any sub-statements and exits that lexical scope when it reaches the end of the brace statement.
+
+## Discard statements
+
+1. Discard statements explicitly discard the result of an expression. They have the form:
+
+    ```ebnf
+    discard-stmt ::=
+      '_' = expr
+    ```
 
 ## Loop statements
 
