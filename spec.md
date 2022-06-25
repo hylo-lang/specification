@@ -579,11 +579,16 @@ Val is a research language based on the principles of mutable value semantics (M
 1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements.  Modules have the form:
 
     ```ebnf
-    module-definition ::= (no-whitespace)
-      whitespace-opt module-body whitespace-opt
+    module-definition ::=
+      whitespace* (module-scope-stmt-list whitespace*)?
 
-    module-body ::=
-      ( module-scope-decl | import-statement )*
+    module-scope-stmt-list ::= (no-whitespace)
+      module-scope-stmt
+      module-scope-stmt-list stmt-separator module-scope-stmt
+
+    module-scope-stmt ::=
+      module-scope-decl
+      import-statement
 
     module-scope-decl ::=
       namespace-decl
@@ -1668,8 +1673,7 @@ Val is a research language based on the principles of mutable value semantics (M
       stmt-list stmt-separator stmt
 
     stmt-separator ::= (no-whitespace)
-      horizontal-space-opt (newlines horizontal-space-opt)*
-      whitespace-opt (';' whitespace-opt)*
+      horizontal-space* ((newline | ';') horizontal-space?)+
     ```
 
 3. The statements contained in a brace statements are called its sub-statements.
@@ -1835,8 +1839,8 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     jump-stmt ::= (no-whitespace)
       cond-binding-stmt
-      'return' horizontal-space-opt expr?
-      'yield' horizontal-space-opt expr
+      'return' (horizontal-space* expr)?
+      'yield' horizontal-space* expr
       'break'
       'continue'
     ```
@@ -2226,8 +2230,11 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Function calls have the form:
 
     ```ebnf
-    function-call-expr ::= (no-whitespace)
-      expr '(' call-argument-list? ')'
+    function-call-expr ::=
+      function-call-head call-argument-list? ')'
+
+    function-call-head ::= (no-whitespace)
+      expr '('
 
     call-argument-list ::=
       call-argument (',' call-argument)*
@@ -2255,8 +2262,11 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Subscript calls have the form:
 
     ```ebnf
-    subscript-call-expr ::= (no-whitespace)
-      expr '[' call-argument-list? ']'
+    subscript-call-expr ::=
+      subscript-call-head call-argument-list? ']'
+
+    subscript-call-head ::= (no-whitespace)
+      expr '['
     ```
 
 ### Lambda expressions
@@ -2592,11 +2602,9 @@ sink e  = a as sink Int
 ## Whitespace and comments
 
     ```ebnf
-    whitespace-opt ::= (no-whitespace)
-      (horizontal-space | newlines)*
-
-    horizontal-space-opt ::= (no-whitespace)
-      horizontal-space*
+    whitespace ::=
+      horizontal-space
+      newline
 
     horizontal-space ::=
       hspace
@@ -2604,7 +2612,7 @@ sink e  = a as sink Int
       block-comment
 
     hspace ::= (regexp)
-      \h+
+      \h
 
     single-line-comment ::= (regexp)
       //\V*
@@ -2614,8 +2622,8 @@ sink e  = a as sink Int
       block-comment-open block-comment '*/'
 
     block-comment-open ::= (regexp)
-      /[*](?:[^*/]|(?:[*][^/])|(?:/[^*]))*
+      /[*](?:[^*/]+|(?:[/]+|[*]+)[^*/])*
 
-    newlines ::= (regexp)
-      \R+
+    newline ::= (regexp)
+      \R
     ```
