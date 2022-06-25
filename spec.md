@@ -582,7 +582,7 @@ Val is a research language based on the principles of mutable value semantics (M
     module-definition ::=
       whitespace* (module-scope-stmt-list whitespace*)?
 
-    module-scope-stmt-list ::= (no-whitespace)
+    module-scope-stmt-list ::= (no-implicit-whitespace)
       module-scope-stmt
       module-scope-stmt-list stmt-separator module-scope-stmt
 
@@ -1668,11 +1668,11 @@ Val is a research language based on the principles of mutable value semantics (M
     brace-stmt ::=
       '{' stmt-list? '}'
 
-    stmt-list ::= (no-whitespace)
+    stmt-list ::= (no-implicit-whitespace)
       stmt
       stmt-list stmt-separator stmt
 
-    stmt-separator ::= (no-whitespace)
+    stmt-separator ::= (no-implicit-whitespace)
       horizontal-space* ((newline | ';') horizontal-space?)+
     ```
 
@@ -1837,7 +1837,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Jump statements unconditionally transfer control. They have the form:
 
     ```ebnf
-    jump-stmt ::= (no-whitespace)
+    jump-stmt ::= (no-implicit-whitespace)
       cond-binding-stmt
       'return' (horizontal-space* expr)?
       'yield' horizontal-space* expr
@@ -1965,7 +1965,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Prefix expressions have the form:
 
     ```ebnf
-    prefix-expr ::= (no-whitespace)
+    prefix-expr ::= (no-implicit-whitespace)
       prefix-operator? suffix-expr
 
     prefix-operator ::=
@@ -1982,7 +1982,7 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Suffix expressions have the form:
 
     ```ebnf
-    suffix-expr ::= (no-whitespace)
+    suffix-expr ::= (no-implicit-whitespace)
       compound-expr
       suffix-expr operator
     ```
@@ -2233,7 +2233,7 @@ Val is a research language based on the principles of mutable value semantics (M
     function-call-expr ::=
       function-call-head call-argument-list? ')'
 
-    function-call-head ::= (no-whitespace)
+    function-call-head ::= (no-implicit-whitespace)
       expr '('
 
     call-argument-list ::=
@@ -2265,7 +2265,7 @@ Val is a research language based on the principles of mutable value semantics (M
     subscript-call-expr ::=
       subscript-call-head call-argument-list? ']'
 
-    subscript-call-head ::= (no-whitespace)
+    subscript-call-head ::= (no-implicit-whitespace)
       expr '['
     ```
 
@@ -2617,7 +2617,7 @@ sink e  = a as sink Int
     single-line-comment ::= (regexp)
       //\V*
 
-    block-comment ::= (no-whitespace)
+    block-comment ::= (no-implicit-whitespace)
       block-comment-open '*/'
       block-comment-open block-comment '*/'
 
