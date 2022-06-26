@@ -1686,7 +1686,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     discard-stmt ::=
-      '_' = expr
+      '_' '=' expr
     ```
 
 ## Loop statements
