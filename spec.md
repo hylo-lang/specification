@@ -211,7 +211,7 @@ Val is a research language based on the principles of mutable value semantics (M
     Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
     false for fun if import in indirect infix init inout let match namespace nil operator postfix
     prefix property public return set sink some static subscript trait true try type typealias var
-    where while yielded
+    where while yield yielded
     ```
 
 ### Identifiers
