@@ -106,22 +106,25 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Floating-point literals have the form:
 
     ```ebnf
-    floating-point-literal ::=
-      decimal-floating-point-literal
-
-    decimal-floating-point-literal ::= (token)
+    floating-point-literal ::= (token)
       decimal-fractional-constant exponent?
       decimal-literal exponent
 
     decimal-fractional-constant ::= (token)
-      decimal-literal '.' decimal-literal
+      decimal-literal '.' floating-point-suffix
 
     exponent ::= (token)
-      'e' exponent-sign? decimal-literal
-      'E' exponent-sign? decimal-literal
+      'e' exponent-sign? floating-point-suffix
+      'E' exponent-sign? floating-point-suffix
 
     exponent-sign ::= (one of)
       + -
+    
+    floating-point-suffix ::= (token)
+      floating-point-suffix-head decimal-literal?
+    
+    floating-point-suffix-head ::= (one of)
+      0 1 2 3 4 5 6 7 8 9
     ```
 
 2. The significand of a floating-point literal is the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10, ignoring all occurrences of `_`. If __exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e`.
