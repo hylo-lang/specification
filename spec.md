@@ -206,8 +206,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```
     Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
-    false for fun if import in indirect infix init inout let match namespace nil postfix prefix public
-    return set sink some static true try type typealias var where while yielded
+    false for fun if import in indirect infix init inout let match namespace nil operator postfix
+    prefix property public return set sink some static subscript trait true try type typealias var
+    where while yielded
     ```
 
 ### Identifiers
@@ -1622,6 +1623,18 @@ Val is a research language based on the principles of mutable value semantics (M
 
 5. A default value must be a non-consuming expression. A default value to a `sink` parameter must evaluate to an escapable object.
 
+## Operator declarations:
+
+1. Operator declarations have the form:
+
+    ```ebnf
+    operator-decl ::=
+      'operator' operator-notation operator (':' precedence-group)?
+
+    precedence-group ::= (one of)
+      assignment disjunction conjunction comparison fallback range addition multiplication shift 
+    ```
+
 ## Capture lists
 
 1. Capture lists have the form:
@@ -1632,6 +1645,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```
 
 2. The bindings of a capture list may not have access or member modifiers.
+
 
 # Statements
 
