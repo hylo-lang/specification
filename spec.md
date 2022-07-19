@@ -790,7 +790,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     generic-parameter ::=
       generic-type-parameter
-      generic-size-parameter
+      generic-value-parameter
 
     generic-type-parameter ::=
       identifier '...'? trait-annotation?
@@ -798,8 +798,8 @@ Val is a research language based on the principles of mutable value semantics (M
     trait-annotation ::=
       ':' trait-composition
 
-    generic-size-parameter ::=
-      identifier ':' 'size'
+    generic-value-parameter ::=
+      'value' identifier
     ```
 
 2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it had been written in the where clause.
@@ -821,7 +821,7 @@ Val is a research language based on the principles of mutable value semantics (M
     where-clause-constraint ::=
       equality-constraint
       conformance-constraint
-      size-constraint-expr
+      value-constraint-expr
 
     equality-constraint ::=
       name-type-expr '==' type-expr
@@ -829,7 +829,7 @@ Val is a research language based on the principles of mutable value semantics (M
     conformance-constraint ::=
       name-type-expr ':' trait-composition
 
-    size-constraint-expr ::=
+    value-constraint-expr ::=
       expr
 
     trait-composition ::=
@@ -907,7 +907,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     associated-decl ::=
       associated-type-decl
-      associated-size-decl
+      associated-value-decl
 
     associated-type-decl ::=
       associated-type-head associated-type-constraints? ('=' type-expr)?
@@ -919,11 +919,11 @@ Val is a research language based on the principles of mutable value semantics (M
       conformance-list
       conformance-list? where-clause
 
-    associated-size-decl ::=
-      associated-size-head where-clause? ('=' expr)?
+    associated-value-decl ::=
+      associated-value-head where-clause? ('=' expr)?
 
-    associated-size-head ::=
-      'size' identifier
+    associated-value-head ::=
+      'value' identifier
     ```
 
 2. The constraints of an associated type or size declaration impose constraints on the types that may satisfy an associated type or size requirement.
@@ -2151,7 +2151,7 @@ Val is a research language based on the principles of mutable value semantics (M
       operator-notation operator
 
     argument-label ::= (token)
-      (identifier | '_') ':'
+      identifier ':'
 
     impl-identifier ::= (token)
       '.' method-introducer
