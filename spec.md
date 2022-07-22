@@ -72,11 +72,14 @@ Val is a research language based on the principles of mutable value semantics (M
     octal-literal ::= (token)
       '0o' octal-digit+
 
+    decimal-digit-head ::= (one of)
+      0 1 2 3 4 5 6 7 8 9
+
     decimal-digit ::= (one of)
       0 1 2 3 4 5 6 7 8 9 _
 
     decimal-literal ::= (token)
-      decimal-digit+
+      decimal-digit-head decimal-digit*
 
     hexadecimal-digit ::= (one of)
       0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f _
@@ -203,17 +206,6 @@ Val is a research language based on the principles of mutable value semantics (M
     }
     ```
 
-### Keywords
-
-1. The following keywords are reserved identifiers.
-
-    ```
-    Any Self Never as as! _as!! async await break catch conformance continue deinit else extension
-    false for fun if import in indirect infix init inout let match namespace nil operator postfix
-    prefix property public return set sink some static subscript trait true try type typealias var
-    where while yield yielded
-    ```
-
 ### Identifiers
 
 1. Identifiers are case-sensitive sequences of letters and digits. They have the form:
@@ -240,7 +232,14 @@ Val is a research language based on the principles of mutable value semantics (M
       mutating size any in
     ```
 
-2. Contextual keywords are identifiers that have a special meaning when appearing in a certain context. When referred to in the grammar, these identifiers are used explicitly rather than using the identifier grammar production.
+3. The following identifiers are reserved keywords and shall not be used to name new entities. [Note: A keyword wrapped in backquotes may be used to name entities.]
+
+    ```
+    Any Self Never as as! any async await break catch conformance continue deinit do else extension
+    false for fun if import in indirect infix init inout let match namespace nil operator postfix
+    prefix property public return set sink some static subscript trait true try type typealias var
+    where while yield yielded
+    ```
 
 ### Raw operators
 
@@ -259,21 +258,21 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. An *entity* is an object, projection, function, subscript, property, trait, type, namespace, or module.
 
-2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name may not have argument labels. A name, function name, or operator name that contains a method implementation introducer is called a *method name*. Every name is introduced by a declaration.
+2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method or subscript implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name shall not have argument labels. A name, function name, or operator name that contains a method or subscript implementation introducer is called a *method name*. Every name is introduced by a declaration unless it is a reserved keyword bound to a built-in entity.
 
 3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let`. are method names.
 
-4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of the all the uses of its sub-expressions.
+4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of all the uses of its sub-expressions.
 
-5. A *binding* is a name that denotes an object or a projection. The value of a binding is the object denoted by that binding or the value of the projection denoted by that binding. A binding may be mutable or immutable. A mutable binding can modify its value; an immutable binding cannot. A binding is *dead* at a given program point if it denotes an object that has escaped, or if there are no uses of it at that program point and any other program point reachable from there. A mutable binding can be *resurrected* by reassigning it to an object; an immutable binding cannot.
+5. A *binding* is a name that denotes an object or projection. The value of a binding is the object denoted by that binding or the value of the projection denoted by that binding. A binding shall be mutable or immutable. A mutable binding shall be used to modify its value; an immutable binding shall not. A binding is *dead* at a given program point if it denotes an object that has escaped, or if there are no uses of it at that program point and any other program point reachable from there. A mutable binding may be *resurrected* by reassigning it to an object; an immutable binding may not.
 
 ## Scopes and declaration spaces
 
-1. A *lexical scope* is a region of the program represented by a syntactic element.
+1. A *lexical scope* is a region of the program text represented by a syntactic element.
 
 2. The lexical scope of a module or namespace declaration is called a *global scope*. The lexical scope of a type, extension, trait, or conformance declaration is called a *type scope*. Unless specified otherwise, the lexical scope of any other syntactic element is called a *local scope*.
 
-3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text delimited by `l1` includes that delimited by `l2`. The innermost lexical scope that contains a lexical scope `l1` and that is not `l1` is called the *parent* of `l1`.
+3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text covered by `l1` includes that covered by `l2`. The innermost lexical scope that contains a lexical scope `l1` and that is not `l1` is called the *parent* of `l1`.
 
 4. A lexical scope `l1` is a *sibling* of a lexical scope `l2` if `l1` is the lexical scope of a trait, nominal product type, or type alias declaration `d` and `l2` is the lexical scope of an extension or conformance declaration for the entity declared by `d`, or if `l2` is a sibling of `l1`.
 
@@ -292,7 +291,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     The declarations space of the type declaration includes `foo` and `bar`.
 
-7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be conditionally introduced if it is introduced by an extension or conformance declaration that has a where clause; otherwise, it is said to be unconditionally introduced. The same name may not be unconditionally introduced more than once in a declaration space.
+7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be conditionally introduced if it is introduced by an extension or conformance declaration that has a where clause; otherwise, it is said to be unconditionally introduced. The same name shall not be unconditionally introduced more than once in a declaration space.
 
     ```val
     type A {
@@ -384,9 +383,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. A program consists of one or more module declarations linked together.
 
-2. A name is said to have linkage when it might denote the same entity a name introduced by a declaration in another scope.
+2. A name is said to have linkage when it may denote the same entity as a name introduced by a declaration in another scope.
 
-    1. When a name has *external linkage*, the entity it denotes can be referred to by names from any scope contained in other module declarations or from other scopes of the same module declaration.
+    1. When a name has *external linkage*, the entity it denotes may be referred to by names from any scope contained in other module declarations or from other scopes of the same module declaration.
 
     2. When a name has *module linkage*, the entity it denotes can be referred to by names from any scope in the same module declaration.
 
@@ -402,7 +401,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 4. A memory location may contain other memory locations, called sub-locations. A memory location that is not a sub-location of any other memory location is called a *root memory location*.
 
-5. A root memory location may be *bound* to a type `A`. Such a memory location shall have the size and alignment suitable to store an object of type `A` and shall not contain any other memory location. Otherwise, the behavior is undefined. The memory locations contained in a memory location bound to `A` are bound according to the memory layout of `A`.
+5. A root memory location may be *bound* to a type `A`. Such a memory location shall have a size and alignment suitable to store an object of type `A` and shall not contain any other memory location. Otherwise, the behavior is undefined. The memory locations contained in a memory location bound to `A` are bound according to the memory layout of `A`.
 
 6. A memory location bound to `A` may be used as storage for an object of type `A`. A bound memory location shall not be rebound to another type or deallocated if it is used as storage for an object whose lifetime has not yet ended, or if it is contained in a bound memory location. Otherwise, the behavior is undefined.
 
@@ -428,9 +427,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. An object has a type determined at compile-time. That type might be polymorphic; in that case, the implementation generates information associated with the object that makes it possible to determine its concrete dynamic type at runtime.
 
-3. An object occupies a memory location in its period of construction, throughout its lifetime, and in its period of destruction. That memory location must be bound to the type of the object.
+3. An object occupies a memory location in its period of construction, throughout its lifetime, and in its period of destruction, during which that memory location must be bound to the type of the object.
 
-4. An object may contain other objects, called sub-objects. A sub-object can be a member sub-object or a buffer element. An object that is not a sub-object of any other object is called a *root object*.
+4. An object may contain other objects, called sub-objects. A sub-object may be a member sub-object or a buffer element. An object that is not a sub-object of any other object is called a *root object*.
 
 5. An object `o1` is nested within another object `o2` if and only if:
 
@@ -453,21 +452,20 @@ Val is a research language based on the principles of mutable value semantics (M
 1. The lifetime of an object of type `A` begins when:
 
     1. a memory location has been allocated and bound to `A`, and
+
     2. its initialization is complete.
 
-2. The lifetime of an object of type `A ` ends when a bound call to any of its sink methods has returned.
+2. The lifetime of an object of type `A ` ends when a bound call to any of its sink methods has returned or when the memory location that it occupies has reach the end of its lifetime.
 
 3. The properties ascribed to objects throughout this document apply for a given object only during its lifetime. [Note: The behavior of an object under construction and destruction might not be the same as the behavior of an object whose lifetime has started and not ended.]
 
 4. An object is said to be *initializing* in the period after its memory location has been bound and before its lifetime has started, *alive* throughout its lifetime, *deinitializing* during a bound call to a sink method of that object, and *dead* in the period after its lifetime has ended and before its storage has been rebound, reused, or deallocated.
 
-5. Unless otherwise specified, the behavior of a program that accesses or projects an object or its sub-objects outside of the object's lifetime is undefined.
-
-6. If, after the lifetime of an object has ended and before the memory location which the object occupied is reused or deallocated, a new object is stored at the memory location which the original object occupied, the name of the original object automatically denotes the new object and, once the lifetime of the new object has started, can be used to manipulate the new object.
+5. If, after the lifetime of an object has ended and before the memory location which the object occupied is reused or deallocated, a new object is stored at the memory location which the original object occupied, the name of the original object automatically denotes the new object and, once the lifetime of the new object has started, can be used to manipulate the new object.
 
 ### Object alignment
 
-1. Object types have alignment requirements which place restrictions on the addresses of the memory locations which an object of that type may occupy. An alignment is an platform-specific integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type.
+1. Object types have alignment requirements which place restrictions on the addresses of the memory locations which an object of that type may occupy. An alignment is a platform-specific integer value representing the number of bytes between successive addresses at which a given object can be allocated. An object type imposes an alignment requirement on every object of that type.
 
 2. Alignments are represented as values of the type `Int`. Valid alignments include only those values of `MemoryLayout<A>.alignnment` for any type `A` plus the value of `Pointer.universal_alignment`. Every alignment value shall be a non-negative integral power of two.
 
@@ -483,31 +481,21 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ### Escapability
 
-1. An object is *sinkable* if its type conforms to the `Sinkable` trait. An object that is not sinkable is `unsinkable`.
+1. An binding is *sinkable* when it denotes an object whose type conforms to the `Sinkable` trait. A binding that is not sinkable is `unsinkable`.
 
-2. An object is said to escape if it is passed as argument to a `sink` parameter, returned from a function, or assigned to a mutable or member binding.
+2. A binding is said to escape if:
 
-[Note for Dim: when the object is passed to sink, it gets unbound right before being passed]
-[Note for Dim: define escapability in terms of bindings rather than projections]
+  1. it appears as the right-hand-side of an assignment or initialization of a mutable or member binding; or
+  
+  2. it appears as the return value of a function; or
+  
+  2. it is used as argument to a `sink` parameter.
 
-3. A sinkable object may escape at a given program point if it is not bound after that program point. An unsinkable object may never escape.
-
-3. (Example)
-
-    ```val
-    fun print_and_return_forty_two() -> Int {
-      let x = 42 // 'x' is escapable here
-      let y = x  // 'x' is not escapable here
-      print(y)   // 'x' is escapable afterward
-      return x   // 'x' escapes here
-    }
-    ```
+3. A sinkable binding is escapable at a given program point if it has no use after that program point, and all bindings denoting the same object or sub-objects thereof are escapable at that program point.
 
 ## Projections
 
-[Note for Dim: properties and subscripts are projections]
-
-1. A projection exposes an object.
+1. A projection exposes an object yielded by a subscript call or property access.
 
 2. The value of a projection is the object exposed by that projection. A projection has the type of its value.
 
@@ -532,27 +520,23 @@ Val is a research language based on the principles of mutable value semantics (M
     }
     ```
 
-6. The projection yielded by a `let` or `inout` subscript or property call projects the arguments bound to the subscript or property's yielded parameters.
+6. The projection yielded by a `let` or `inout` subscript call or property access projects the arguments bound to the subscript or property's parameters.
 
 7. (Example)
 
     ```val
-    subscript min<T, E>(
-      _ a: yielded T, _ b: yielded T, by less_than: [E] (T, T) -> Bool
-    ): T {
-      let { yield if !less_than(a, b) { b } else { a } }
+    subscript min<T: Comparable>(_ a: T, _ b: T): T {
+      let { yield if a > b { b } else { a } }
     }
 
     fun main() {
-      let comparator = Int.infix<
       let (x, y) = (2, 3)
-      let z = min[x, y, by: comparator]
-        // 'z' projects both 'x' and 'y', but not 'comparator'
+      let z = min[x, y] // 'z' projects both 'x' and 'y'
       print(z)
     }
     ```
 
-    The expression `min[x, y, by: comparator]` is a call to the `let` implementation of `min`, which projects the values of its first and second arguments, but not that of its third argument.
+    The expression `min[x, y]` is a call to the `let` implementation of `min`, which projects the values of its arguments.
 
 8. If a projection `p` projects an object `o` immutably, `o` is immutable for the duration of `p`'s lifetime. If a projection `p` projects an object `o` mutably, `o` is inaccessible for the duration of `p`'s lifetime.
 
@@ -580,10 +564,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Modules
 
-1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements.  Modules have the form:
+1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements defined in one or multiple source files. An individual source file has the form:
 
     ```ebnf
-    module-definition ::=
+    source-file ::=
       whitespace* (module-scope-stmt-list whitespace*)?
 
     module-scope-stmt-list ::= (no-implicit-whitespace)
@@ -592,7 +576,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     module-scope-stmt ::=
       module-scope-decl
-      import-statement
+      import-decl
 
     module-scope-decl ::=
       namespace-decl
@@ -606,17 +590,15 @@ Val is a research language based on the principles of mutable value semantics (M
       subscript-decl
       operator-decl
 
-    import-statement ::=
+    import-decl ::=
       'import' identifier
     ```
 
-2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> ()`. A program shall contain exactly one entry module.
+2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> Unit`. A program shall contain exactly one entry module.
 
 ## Program execution
 
-1. A program shall designate one entry module.
-
-2. Executing a program starts a thread of execution in which the `main` function of its entry module is invoked. [Note: the arguments passed to the program from the environment in which it is run are stored in the global variable `Val.Environment.Arguments`.]
+1. Executing a program starts a thread of execution in which the `main` function of its entry module is invoked. [Note: the arguments passed to the program from the environment in which it is run are stored in the global variable `Val.Environment.Arguments`.]
 
 ### Sequential execution
 
@@ -624,17 +606,19 @@ Val is a research language based on the principles of mutable value semantics (M
 
     1. the operands of `e`,
 
-    2. any function call that `e` implicitly invokes, or
+    2. any function call that `e` implicitly invokes,
+    
+    3. if `e` is a __lambda-expr__ or __async_expr__, the initialization of the entities captured,
+    
+    4. if `e` is a function or subscript call, the expression of each default argument used in the call.
 
-    3. if `e` is a function call or implicitly invokes a function, the expression of each default argument used in the call.
+2. A *sub-expression* of an expression `e` is an immediate sub-expression of `e` or a sub-expression of an immediate sub-expression of `e`. [Note: Expressions appearing in the __lambda-body__ of a __lambda-expr__ are not sub-expressions of the expression.]
 
-2. A *sub-expression* of an expression `e` is an immediate sub-expression of `e` or a sub-expression of an immediate sub-expression of `e`.
+3. Modifying an object, calling a library I/O function, or calling a function that does any of those operations are all side effects, which are changes in the state of the execution environment. *Evaluation* of an expression (or a sub-expression) in general includes both value computations (including determining the memory location of an object for lvalue evaluation and fetching an object previously bound to a binding for rvalue evaluation) and initiation of side effects.
 
-3. Modifying an object, calling a library I/O function, or calling a function that does any of those operations are all side effects, which are changes in the state of the execution environment. *Evaluation* of an expression (or a sub-expression) in general includes both value computations (including determining the identity of an object for lvalue evaluation and fetching a value previously assigned to an object for rvalue evaluation) and initiation of side effects.
+4. *Sequenced before* is an asymmetric, transitive, pair-wise relation between evaluations executed by a single thread, which induces a partial order among those evaluations. Given any two evaluations `A` and `B`, if `A` is sequenced before `B` (or, equivalently, `B` is sequenced after `A`), then the execution of `A` shall precede the execution of `B`. If `A` is not sequenced before `B` and `B` is not sequenced before `A`, then `A` and `B` are *unsequenced*. [Note: the execution of unsequenced evaluations can overlap.] Evaluations `A` and `B` are indeterminately sequenced when either `A` is sequenced before `B` or `B` is sequenced before `A`, but it is unspecified which. [Note: indeterminately sequenced evaluations cannot overlap, but either could be executed first.] An expression `e1` is said to be sequenced before an expression `e2` if every value computation and every side effect associated with the expression `e1` is sequenced before every value computation and every side effect associated with the expression `e2`.
 
-4. *Sequenced before* is an asymmetric, transitive, pair-wise relation between evaluations executed by a single thread, which induces a partial order among those evaluations. Given any two evaluations A and B, if A is sequenced before B (or, equivalently, B is sequenced after A), then the execution of A shall precede the execution of B. If A is not sequenced before B and B is not sequenced before A, then A and B are unsequenced. [Note: The execution of unsequenced evaluations can overlap.] Evaluations A and B are indeterminately sequenced when either A is sequenced before B or B is sequenced before A, but it is unspecified which. [Note: Indeterminately sequenced evaluations cannot overlap, but either could be executed first.] An expression `e1` is said to be sequenced before an expression `e2` if every value computation and every side effect associated with the expression `e1` is sequenced before every value computation and every side effect associated with the expression `e2`.
-
-5. The immediate sub-expressions of an expression are sequenced from left to right.
+5. The immediate sub-expressions of an expression `e` are sequenced from left to right, unless `e` is a function or subscript call. In that case, the arguments of `e` are sequenced from left to right and the callee is sequenced after the last argument.
 
 # Types
 
@@ -793,13 +777,13 @@ Val is a research language based on the principles of mutable value semantics (M
       generic-value-parameter
 
     generic-type-parameter ::=
-      identifier '...'? trait-annotation?
+      '@type'? identifier '...'? trait-annotation? ('=' type-expr)?
 
     trait-annotation ::=
       ':' trait-composition
 
     generic-value-parameter ::=
-      'value' identifier
+      '@value' identifier ':' type-expr ('=' expr)?
     ```
 
 2. When a generic type parameter is followed by a trait annotation, that annotation is interpreted as a conformance constraint as though it had been written in the where clause.
@@ -816,7 +800,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     where-clause ::=
-      'where' where-clause-constraint
+      'where' where-clause-constraint-list
+
+    where-clause-constraint-list ::=
+      where-clause-constraint (',' where-clause-constraint)*
 
     where-clause-constraint ::=
       equality-constraint
@@ -830,7 +817,7 @@ Val is a research language based on the principles of mutable value semantics (M
       name-type-expr ':' trait-composition
 
     value-constraint-expr ::=
-      expr
+      '@value' expr
 
     trait-composition ::=
       name-type-expr ('&' name-type-expr)*
@@ -856,7 +843,22 @@ Val is a research language based on the principles of mutable value semantics (M
       access-modifier? 'namespace' identifier
 
     namespace-body ::=
-      '{' module-scope-decl* '}'
+      '{' namespace-member-list? '}'
+
+    namespace-member-list ::= (no-implicit-whitespace)
+      namespace-member
+      namespace-member-list stmt-separator namespace-member
+
+    namespace-member ::=
+      namespace-decl
+      trait-decl
+      type-alias-decl
+      product-type-decl
+      extension-decl
+      conformance-decl
+      binding-decl
+      function-decl
+      subscript-decl
     ```
 
 ## Trait declarations
@@ -943,9 +945,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. A function declaration that appears in the body of a trait declaration is a *method requirement declaration* that defines one or more *method requirements*. A method requirement is the specification of a method that must be implemented in conforming types.
 
-2. When a method requirement declaration has a __function-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
+2. When a method requirement declaration has a __method-bundle-body__, each method implementation in that body denotes a method requirement. When a method requirement declaration is bodiless, it defines a single method requirement whose kind depends on the receiver modifier of the method requirement declaration.
 
-3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __function-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
+3. A method requirement may have one or several default implementations. A default implementation may be defined as the body of a function declaration requirement, as the body of a method implementation in the __method-bundle-body__ of a function requirement declaration, or via a default requirement implementation declared in a trait extension.
 
 4. (Example)
 
@@ -1074,6 +1076,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     product-type-member-decl ::=
       function-decl
+      deinit-decl
       subscript-decl
       property-decl
       binding-decl
@@ -1292,26 +1295,28 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     function-decl ::=
-      memberwise-ctor-decl
+      memberwise-init-decl
       function-head function-signature function-body?
 
-    memberwise-ctor-decl ::=
+    memberwise-init-decl ::=
       'memberwise' 'init'
 
-    function-head ::=
-      access-modifier? member-modifier* function-identifier generic-clause? capture-list?
+    deinit-decl ::=
+      'deinit' brace-stmt
 
-    function-identifier ::=
+    function-head ::=
+      access-modifier? member-modifier* function-decl-identifier generic-clause? capture-list?
+
+    function-decl-identifier ::=
       'init'
-      'deinit'
       'fun' identifier
       operator-notation 'fun' operator
 
     function-body ::=
-      function-bundle-body
+      method-bundle-body
       brace-stmt
 
-    function-bundle-body ::=
+    method-bundle-body ::=
       '{' method-impl+ '}'
 
     operator ::= (token)
@@ -1358,7 +1363,13 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     function-signature ::=
-      '(' parameter-list? ')' ('->' type-expr)?
+      '(' parameter-list? ')' receiver-effect? ('->' type-expr)? type-aliases-clause?
+    
+    type-aliases-clause ::=
+      'where' type-aliases-clause-item (',' type-aliases-clause-item)*
+    
+    type-aliases-clause-item ::=
+      'typealias'identifier '=' type-expr
     ```
 
 2. The default value of a parameter declaration may not refer to another parameter in a function signature.
@@ -1474,14 +1485,12 @@ Val is a research language based on the principles of mutable value semantics (M
       subscript-head subscript-signature subscript-body
 
     subscript-head ::=
-      member-modifier* subscript-identifier? generic-clause? capture-list?
+      access-modifier? member-modifier* 'subscript' identifier? generic-clause? capture-list?
 
     subscript-identifier ::=
       'subscript' identifier
-      operator-notation 'subscript' operator
 
     subscript-body ::=
-      brace-stmt
       '{' subscript-impl+ '}'
     ```
 
@@ -1514,11 +1523,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 7. A subscript declaration may contain at most one subscript implementation of each kind.
 
-8. If the body of a subscript declaration is a brace statement, it is interpreted as the body of a `let` subscript implementation.
-
-9. An operator notation specifier defines an operator member subscript; it may only appear in a subscript declaration at type scope.
-
-10.  A capture list may only appear in a subscript declaration at local scope.
+9.  A capture list may only appear in a subscript declaration at local scope.
 
 ### Subscript signatures
 
@@ -1526,7 +1531,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     subscript-signature ::=
-      '(' parameter-list? ')' ':' 'var'? type-expr
+      '(' parameter-list? ')' receiver-effect? ':' 'var'? type-expr
     ```
 
 2. The default value of a parameter declaration may not refer to another parameter in a subscript signature.
@@ -1779,15 +1784,12 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     for-stmt ::=
-      'for' for-counter-decl for-range loop-filter? brace-stmt
-
-    for-counter-decl ::=
-      pattern
+      'for' binding-pattern for-range for-filter? brace-stmt
 
     for-range ::=
       'in' expr
 
-    loop-filter ::=
+    for-filter ::=
       'where' expr
     ```
 
@@ -1856,7 +1858,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     jump-stmt ::= (no-implicit-whitespace)
-      cond-binding-stmt
+      conditional-binding-stmt
       'return' (horizontal-space* expr)?
       'yield' horizontal-space* expr
       'break'
@@ -1870,11 +1872,12 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Conditional binding statements have the form:
 
     ```ebnf
-    cond-binding-stmt ::=
-      binding-pattern '??' cond-binding-body
+    conditional-binding-stmt ::=
+      binding-pattern 'else' cond-binding-fallback
 
-    cond-binding-body ::=
+    conditional-binding-fallback ::=
       jump-stmt
+      brace-stmt
       expr
     ```
 
@@ -1943,7 +1946,12 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     expr ::=
-      prefix-expr infix-tail?
+      infix-expr-head infix-expr-tail*
+    
+    infix-expr-head ::=
+      async-expr
+      await-expr
+      prefix-expr
     ```
 
 2. A value expression is a sequence of operators and operands that specifies a computation. A value expression results in a value and may cause side effects.
@@ -1961,12 +1969,15 @@ Val is a research language based on the principles of mutable value semantics (M
 1. Infix tails have the form:
 
     ```ebnf
-    infix-tail ::=
-      infix-item+
+    infix-expr-tail ::=
+      type-casting-tail
+      infix-operator-tail
 
-    infix-item ::=
-      infix-operator prefix-expr
+    type-casting-tail ::=
       type-casting-operator type-expr
+
+    infix-operator-tail ::=
+      infix-operator prefix-expr
 
     infix-operator ::=
       operator
@@ -1978,31 +1989,65 @@ Val is a research language based on the principles of mutable value semantics (M
       '...'
     ```
 
+## Async expressions
+
+1. Async expressions have the form:
+
+    ```ebnf
+    async-expr ::=
+      async-expr-head expr
+      async-expr-head '->' type-expr brace-stmt
+    
+    async-expr-head ::=
+      'async' capture-list?
+    ```
+
+### Notes:
+
+An async expression defined in a scope shall either escape that scope or be consumed by a consuming method.
+`await e` is sugar for `e.await()`, where `await` is a consuming method.
+
+## Await expressions
+
+1. Await expressions have the form:
+
+    ```ebnf
+    await-expr ::=
+      'await' expr
+    ```
+
+
 ## Prefix expressions
 
 1. Prefix expressions have the form:
 
     ```ebnf
     prefix-expr ::= (no-implicit-whitespace)
-      prefix-operator? suffix-expr
+      prefix-operator? postfix-expr
 
     prefix-operator ::=
-      operator
-      'async'
-      'await'
-      '&'
+      prefix-operator-head raw-operator*
+    
+    prefix-operator-head ::= (regexp)
+      (?:(?![<])[-*/^%&!?\p{Sm}])
     ```
 
 2. There shall be no whitespace between the operator and the operand of a prefix expression.
 
-## Suffix expressions
+## Postfix expressions
 
-1. Suffix expressions have the form:
+1. Postfix expressions have the form:
 
     ```ebnf
-    suffix-expr ::= (no-implicit-whitespace)
+    postfix-expr ::= (no-implicit-whitespace)
       compound-expr
-      suffix-expr operator
+      postfix-expr postfix-operator
+
+    postfix-operator ::= (token)
+      postfix-operator-head raw-operator*
+    
+    postfix-operator-head ::= (regexp)
+      (?:(?![>])[-*/^%&!?\p{Sm}])
     ```
 
 1. There shall be no whitespace between the operator and the operand of a suffix expression.
@@ -2021,9 +2066,9 @@ Val is a research language based on the principles of mutable value semantics (M
       implicit-member-ref
       lambda-expr
       selection-expr
+      inout-expr
       tuple-expr
       'nil'
-      '_'
     ```
 
 ### Scalar literals
@@ -2113,13 +2158,13 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     primary-decl-ref ::=
-      identifier-expr type-argument-list?
+      identifier-expr static-argument-list?
 
-    type-argument-list ::=
-      '<' type-argument (',' type-argument)* '>'
+    static-argument-list ::=
+      '<' static-argument (',' static-argument)* '>'
 
-    type-argument ::=
-      (identifier ':')? type-expr
+    static-argument ::=
+      (identifier ':')? (expr | type-expr)
     ```
 
 ### Implicit member references
@@ -2202,7 +2247,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     tuple-expr ::=
-      '(' tuple-expr-element-list ')'
+      '(' tuple-expr-element-list? ')'
 
     tuple-expr-element-list ::=
       tuple-expr-element (',' tuple-expr-element)?
@@ -2220,6 +2265,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     compound-expr ::=
       value-member-expr
+      static-value-member-expr
       function-call-expr
       subscript-call-expr
       primary-expr
@@ -2229,17 +2275,33 @@ Val is a research language based on the principles of mutable value semantics (M
 
 #### General
 
-1. Member accesses have the form:
+1. Value member accesses have the form:
 
     ```ebnf
     value-member-expr ::=
-      expr '.' primary-decl-ref
-      type-expr '.' primary-decl-ref
+      labeled-member-expr
+      indexed-member-expr
+
+    labeled-member-expr ::=
+      primary-expr '.' primary-decl-ref
+    
+    indexed-member-expr ::=
+      primary-expr '.' member-index
+
+    member-index ::= (token)
+      decimal-digit-head+
     ```
 
-2. A member access whose declaration reference denotes a non-static member binding or a non-static method is called a value member access. A member access whose declaration reference denotes a a static binding member or a static method is called a type member access.
+### Static value member accesses
 
-3. A value member access whose base is an expression is called an unbound value member access.
+#### General
+
+1. Static value member accesses have the form:
+
+    ```ebnf
+    static-value-member-expr
+      type-expr '.' primary-decl-ref
+    ```
 
 ### Function calls
 
@@ -2252,7 +2314,7 @@ Val is a research language based on the principles of mutable value semantics (M
       function-call-head call-argument-list? ')'
 
     function-call-head ::= (no-implicit-whitespace)
-      expr '('
+      primary-expr '('
 
     call-argument-list ::=
       call-argument (',' call-argument)*
@@ -2265,15 +2327,17 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. The kind of the call expression depends on its callee:
 
-    1. if the callee is a type expression, the call expression is an initializer call; or
+    1. if the callee is a type expression, the call expression is an *initializer call*; or
 
     2. if the callee is a value member expression, the call expression is a method call; or
 
-    3. if the callee is a type member expression referring to a function declaration, the call expression is a static method call; or
+    3. if the callee is a type member expression referring to a function declaration, the call expression is a static method call;
 
     4. otherwise, the call expression is a function call.
 
-3. Arguments to `sink` parameters are consumed. Arguments to `let` parameters are projected immutably in the entire call expression. Arguments to `inout` and `set` parameters are projected mutably in the entire call expression.
+3. An initializer all `T(a1, ..., an)` desugars to `var storage: T; T.init(&storage, a1, ..., a2)`. A method call `x.m(a1, ..., an)` (or `&x.m(a1, ..., an)`) desugars to `T.m(x, a1, ..., an)` (or respectively `T.m(&x, a1, ..., an)`) where `T` is the static type of `x`.
+
+4. Arguments to `sink` parameters are consumed. Arguments to `let` parameters are projected immutably in the entire call expression. Arguments to `inout` and `set` parameters are projected mutably in the entire call expression.
 
 ### Subscript calls
 
@@ -2284,7 +2348,7 @@ Val is a research language based on the principles of mutable value semantics (M
       subscript-call-head call-argument-list? ']'
 
     subscript-call-head ::= (no-implicit-whitespace)
-      expr '['
+      primary-expr '['
     ```
 
 ### Lambda expressions
@@ -2337,10 +2401,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     match-expr ::=
-      'match' expr '{' (match-case | ';')* '}'
+      'match' expr '{' match-case* '}'
 
     match-case ::=
-      pattern brace-stmt
+      pattern ('where' expr)? brace-stmt
     ```
 
 ## Operators
@@ -2360,7 +2424,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     type-casting-operator ::= (one of)
-      as as! _as!!
+      as as!
     ```
 
 2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
@@ -2388,7 +2452,6 @@ sink e  = a as sink Int
     ```ebnf
     type-expr ::=
       async-type-expr
-      buffer-type-expr
       conformance-lens-type-expr
       existential-type-expr
       opaque-type-expr
@@ -2399,6 +2462,7 @@ sink e  = a as sink Int
       tuple-type-expr
       union-type-expr
       wildcard-type-expr
+      '(' type-expr ')'
     ```
 
 ## Asynchronous type expressions
@@ -2408,15 +2472,6 @@ sink e  = a as sink Int
     ```ebnf
     async-type-expr ::=
       'async' type-expr
-    ```
-
-## Buffer type expressions
-
-1. Buffer type expressions have the form:
-
-    ```ebnf
-    buffer-type-expr ::=
-      type-expr '[' expr? ']'
     ```
 
 ## Conformance lenses
@@ -2462,9 +2517,10 @@ sink e  = a as sink Int
 
     ```ebnf
     lambda-type-expr ::=
-      lambda-environment? '(' lamda-parameter-list? ')' lambda-receiver-effect? '->' type-expr
+      lambda-environment? '(' lamda-parameter-list? ')' receiver-effect? '->' type-expr
 
     lambda-environment ::=
+      'thin'
       '[' type-expr ']'
 
     lamda-parameter-list ::=
@@ -2473,7 +2529,7 @@ sink e  = a as sink Int
     lambda-parameter ::=
       (identifier ':')? type-expr
 
-    lambda-receiver-effect ::= (one of)
+    receiver-effect ::= (one of)
       inout sink
     ```
 
@@ -2483,7 +2539,10 @@ sink e  = a as sink Int
 
     ```ebnf
     name-type-expr ::=
-      (type-expr '.')? type-identifier type-argument-list?
+      (type-expr '.')? primary-type-decl-ref
+
+    primary-type-decl-ref ::=
+      type-identifier type-argument-list?
 
     type-identifier ::=
       identifier
@@ -2521,7 +2580,7 @@ sink e  = a as sink Int
 
     ```ebnf
     tuple-type-expr ::=
-      '(' tuple-type-element-list ')'
+      '{' tuple-type-element-list '}'
 
     tuple-type-element-list ::=
       tuple-type-element (',' tuple-type-element)?
