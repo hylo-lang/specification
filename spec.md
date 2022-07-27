@@ -694,6 +694,25 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. A declaration may be composed of other declarations, called sub-declarations. The entities introduced by the sub-declaration of a declaration `d` are also said to be introduced by `d`. [Note: a sub-declaration is part of a declaration itself, unlike a member declaration, which is a separate construct contained in the lexical scope of a declaration.]
 
+## Attributes
+
+1. Declaration attributes have the form:
+
+    ```ebnf
+    decl-attribute ::=
+      attribute-name attribute-parameter-list?
+
+    attribute-name ::= (token)
+      '@' name
+
+   attribute-parameter-list ::=
+     '(' attribute-parameter (',' attribute-parameter)* ')'
+
+   attribute-parameter ::=
+     simple-string
+     integer-literal
+    ```
+
 ## Modifiers
 
 ### Access modifiers
