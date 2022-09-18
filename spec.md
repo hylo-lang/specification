@@ -1962,6 +1962,7 @@ Val is a research language based on the principles of mutable value semantics (M
     infix-expr-head ::=
       async-expr
       await-expr
+      unsafe-expr
       prefix-expr
     ```
 
@@ -2027,6 +2028,14 @@ An async expression defined in a scope shall either escape that scope or be cons
       'await' expr
     ```
 
+## Unsafe expressions
+
+1. Unsafe expressions have the form:
+
+    ```ebnf
+    unsafe-expr ::=
+      'unsafe' expr
+    ```
 
 ## Prefix expressions
 
