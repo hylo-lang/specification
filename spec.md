@@ -604,11 +604,11 @@ Val is a research language based on the principles of mutable value semantics (M
 
 1. The *immediate sub-expressions* of an expression `e` are:
 
-    1. the operands of `e`,
+    1. the operands of `e`; and
 
-    2. any function call that `e` implicitly invokes,
+    2. any function call that `e` implicitly invokes; and
     
-    3. if `e` is a __lambda-expr__ or __async_expr__, the initialization of the entities captured,
+    3. if `e` is a __lambda-expr__ or __async_expr__, the initialization of the entities captured; and
     
     4. if `e` is a function or subscript call, the expression of each default argument used in the call.
 
@@ -1216,48 +1216,37 @@ Val is a research language based on the principles of mutable value semantics (M
 
     This binding declaration defines two new immutable bindings: `name` and `age`.
 
-3. A binding declaration defines a new binding for each name pattern in __binding-pattern__. All new bindings are defined with the same capabilities.
+3. A binding declaration defines a new binding for each name pattern in __binding-pattern__. The pattern in __binding-pattern__ shall not contain any expression patterns. All bindings introduced by a binding declaration are defined with the same capabilities.
 
     1. A binding declaration introduced with `let` defines an immutable binding. The value of a live immutable binding may be projected immutably. The value of an immutable binding may not be projected mutably for the duration of that binding's lifetime.
 
     2. A binding declaration introduced with `var` or `inout` defines a mutable binding. The value of a live mutable binding may be projected mutably or immutably.
 
-  A mutable binding can appear on the left side of an assignment, on the right side of an assignment, as the initializer of a binding, as argument to an `inout` parameter, or as argument to an `set` parameter.
+  A mutable binding can appear on the left side of an assignment, on the right side of an assignment, as the initializer of a binding, or as the operand of an __inout-expr__.
 
-4. The pattern of a binding declaration may not contain any expression patterns.
+4. A binding declaration may be defined at module scope, namespace scope, type scope, or function scope.
 
-5. A binding declaration may be defined at module scope, namespace scope, type scope, or function scope.
+    1. A binding declaration at module scope or namespace scope is called a *global binding declaration*. It introduces one or more global bindings. A global binding declaration shall be introduced with `let`.
 
-    1. A binding declaration at module scope or namespace scope is called a global binding declaration. It introduces one or more global bindings. A global binding declaration must be introduced with `let`.
+    2. A binding declaration at type scope is called a *static member binding declaration* if it contains a `static` modifier. Otherwise, it is called a *member binding declaration*. A static member binding declaration introduces one or more global bindings. A member binding declaration introduces one or more member bindings.
 
-    2. A binding declaration at type scope is called a static member binding declaration if it contains a `static` modifier. Otherwise, it is called a member binding declaration. A static member binding declaration introduces one or more global bindings. A member binding declaration introduces one or more member bindings.
+    3. A binding declaration at function scope is called a *local binding declaration*. It introduces one or more local bindings.
 
-    3. A binding declaration at function scope is called a local binding declaration. It introduces one or more local bindings.
-
-6. The `sink` capability may only appear in a local binding declaration introduced with `let` or `var`.
+5. The `sink` capability may only appear in a local binding declaration introduced with `let` or `var`.
 
 ### Initialization
 
-1. A static member binding declaration, or global binding declaration must contain an initializer. Initialization occurs at the first dynamic use of one of the declared bindings.
+1. The initializer of a binding is the expression denoting the value with which that binding is initialized. If a binding is introduced by a binding declaration with a __binding-initializer__, its initializer is the corresponding sub-expression of __binding-initializer__, after applying destructuring. Otherwise, its initializer is the corresponding sub-expression of the right hand side of the first assignment expression where that binding appears on the left hand side.
 
-2. A local binding declaration must contain an initializer unless it appears in the condition of a match expression. If the binding declaration is a sub-statement in a brace statement, initialization occurs immediately after declaration. If the binding declaration is a condition in a loop statement or a condition in a selection expression, initialization occurs immediately after a successful pattern matching.
+2. A static member binding declaration, or global binding declaration shall have an __binding-initializer__. Initialization occurs at the first dynamic use of one of the declared bindings.
 
-3. A member binding declaration may not have an initializer. Initialization occurs in the initializer of the object of which the introduced bindings are members (see Type initialization).
+3. A local binding declaration introduced with `inout` shall have a __binding-initializer__ unless it appears in a __for-head__ a __match-case-head__. If the binding declaration is an immediate sub-statement of a __brace-stmt__, initialization of all the bindings introduced occurs immediately after declaration. If the binding declaration is a __for-head__ or a condition in a selection expression, initialization of all the bindings introduced occurs immediately after a successful pattern matching.
 
-4. The initialization of an escapable binding, or a binding whose declaration is introduced with `var`, consumes the value of its initializer.
+4. A local binding declaration introduced with `let` creates storage for all the bindings introduced the declaration has a __binding-initializer__ that evaluates to a rvalue or if the right hand side of the initializing statement of the binding evaluates to a rvalue.
 
-5. The initialization of a non-escapable binding whose declaration is introduced with `let` or `inout` projects the object to which its initializer evaluates. The projection is immutable if the binding is immutable. Otherwise, it is mutable. The projection is for the duration of the binding's lifetime.
+5. A local binding declaration introduced with `var` creates storage for all the bindings introduced. Initialization of all the bindings introduced occurs immediately after declaration if it has a __binding-initializer__. Otherwise, it occurs individually for each binding with the first assignment expression where that binding appear on the left hand side.
 
-6. (Example)
-
-    ```val
-    fun main() {
-      var fruits = ["apple", "mango", "orange"]
-      inout first = fruits[0] // mutable projection of 'fruits[0]'
-      first = "strawberry"
-      print(first)            // projection ends afterward
-    }
-    ```
+6. A member binding declaration may not have an initializer. Initialization of all the bindings introduced occurs in the initializer of the object of which they are members (see Type initialization).
 
 ### Lifetime
 
@@ -1803,7 +1792,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     for-stmt ::=
-      'for' binding-pattern for-range for-filter? brace-stmt
+      dor-head for-range for-filter? brace-stmt
+
+    for-head ::
+      'for' binding-decl
 
     for-range ::=
       'in' expr
@@ -2260,6 +2252,15 @@ An async expression defined in a scope shall either escape that scope or be cons
     let g = Vector2.scaled(by:).sink // OK
     ```
 
+### Inout expressions
+
+1. Inout expressions have the form:
+
+    ```ebnf
+    inout-expr ::= (no-implicit-whitespace)
+      '&' expr
+    ```
+
 ### Tuple expressions
 
 1. Tuple expressions have the form:
@@ -2423,7 +2424,10 @@ An async expression defined in a scope shall either escape that scope or be cons
       'match' expr '{' match-case* '}'
 
     match-case ::=
-      pattern ('where' expr)? brace-stmt
+      match-case-head ('where' expr)? brace-stmt
+
+    match-case-head ::=
+      binding-decl
     ```
 
 ## Operators
