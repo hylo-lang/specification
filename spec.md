@@ -122,10 +122,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     exponent-sign ::= (one of)
       + -
-    
+
     floating-point-suffix ::= (token)
       floating-point-suffix-head decimal-literal?
-    
+
     floating-point-suffix-head ::= (one of)
       0 1 2 3 4 5 6 7 8 9
     ```
@@ -486,9 +486,9 @@ Val is a research language based on the principles of mutable value semantics (M
 2. A binding is said to escape if:
 
   1. it appears as the right-hand-side of an assignment or initialization of a mutable or member binding; or
-  
+
   2. it appears as the return value of a function; or
-  
+
   2. it is used as argument to a `sink` parameter.
 
 3. A sinkable binding is escapable at a given program point if it has no use after that program point, and all bindings denoting the same object or sub-objects thereof are escapable at that program point.
@@ -607,9 +607,9 @@ Val is a research language based on the principles of mutable value semantics (M
     1. the operands of `e`; and
 
     2. any function call that `e` implicitly invokes; and
-    
+
     3. if `e` is a __lambda-expr__ or __async_expr__, the initialization of the entities captured; and
-    
+
     4. if `e` is a function or subscript call, the expression of each default argument used in the call.
 
 2. A *sub-expression* of an expression `e` is an immediate sub-expression of `e` or a sub-expression of an immediate sub-expression of `e`. [Note: Expressions appearing in the __lambda-body__ of a __lambda-expr__ are not sub-expressions of the expression.]
@@ -1372,10 +1372,10 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     function-signature ::=
       '(' parameter-list? ')' receiver-effect? ('->' type-expr)? type-aliases-clause?
-    
+
     type-aliases-clause ::=
       'where' type-aliases-clause-item (',' type-aliases-clause-item)*
-    
+
     type-aliases-clause-item ::=
       'typealias'identifier '=' type-expr
     ```
@@ -1654,7 +1654,7 @@ Val is a research language based on the principles of mutable value semantics (M
       'operator' operator-notation operator (':' precedence-group)?
 
     precedence-group ::= (one of)
-      assignment disjunction conjunction comparison fallback range addition multiplication shift 
+      assignment disjunction conjunction comparison fallback range addition multiplication shift
     ```
 
 ## Capture lists
@@ -1794,7 +1794,7 @@ Val is a research language based on the principles of mutable value semantics (M
     for-stmt ::=
       dor-head for-range for-filter? brace-stmt
 
-    for-head ::
+    for-head ::=
       'for' binding-decl
 
     for-range ::=
@@ -1958,7 +1958,7 @@ Val is a research language based on the principles of mutable value semantics (M
     ```ebnf
     expr ::=
       infix-expr-head infix-expr-tail*
-    
+
     infix-expr-head ::=
       async-expr
       await-expr
@@ -2009,7 +2009,7 @@ Val is a research language based on the principles of mutable value semantics (M
     async-expr ::=
       async-expr-head expr
       async-expr-head '->' type-expr brace-stmt
-    
+
     async-expr-head ::=
       'async' capture-list?
     ```
@@ -2047,7 +2047,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
     prefix-operator ::=
       prefix-operator-head raw-operator*
-    
+
     prefix-operator-head ::= (regexp)
       (?:(?![<])[-*/^%&!?\p{Sm}])
     ```
@@ -2065,7 +2065,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
     postfix-operator ::= (token)
       postfix-operator-head raw-operator*
-    
+
     postfix-operator-head ::= (regexp)
       (?:(?![>])[-*/^%&!?\p{Sm}])
     ```
@@ -2313,7 +2313,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
     labeled-member-expr ::=
       primary-expr '.' primary-decl-ref
-    
+
     indexed-member-expr ::=
       primary-expr '.' member-index
 
@@ -2328,7 +2328,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 1. Static value member accesses have the form:
 
     ```ebnf
-    static-value-member-expr
+    static-value-member-expr ::=
       type-expr '.' primary-decl-ref
     ```
 
