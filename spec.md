@@ -700,15 +700,15 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     decl-attribute ::=
-      attribute-name attribute-parameter-list?
+      attribute-name attribute-argument-list?
 
     attribute-name ::= (token)
       '@' name
 
-   attribute-parameter-list ::=
-     '(' attribute-parameter (',' attribute-parameter)* ')'
+   attribute-argument-list ::=
+     '(' attribute-argument (',' attribute-argument)* ')'
 
-   attribute-parameter ::=
+   attribute-argument ::=
      simple-string
      integer-literal
     ```
