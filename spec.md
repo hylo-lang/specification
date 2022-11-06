@@ -594,7 +594,7 @@ Val is a research language based on the principles of mutable value semantics (M
       'import' identifier
     ```
 
-2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> Unit`. A program shall contain exactly one entry module.
+2. A module is called an *entry module* if it defines a public global function named `main` with type `() -> Void`. A program shall contain exactly one entry module.
 
 ## Program execution
 
