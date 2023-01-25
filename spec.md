@@ -1318,7 +1318,7 @@ Val is a research language based on the principles of mutable value semantics (M
     function-decl-identifier ::=
       'init'
       'fun' identifier
-      operator-notation 'fun' operator
+      'fun' operator-notation operator
 
     function-body ::=
       method-bundle-body
