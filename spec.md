@@ -1111,14 +1111,10 @@ Val is a research language based on the principles of mutable value semantics (M
 
     ```ebnf
     type-alias-decl ::=
-      type-alias-head type-alias-body
+      type-alias-head '=' type-expr
 
     type-alias-head ::=
       access-modifier? 'typealias' identifier generic-clause?
-
-    type-alias-body ::=
-      '=' type-expr
-      '=' union-decl
 
     union-decl ::=
       product-type-decl ('|' product-type-decl)*
