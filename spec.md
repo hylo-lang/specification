@@ -485,11 +485,11 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. A binding is said to escape if:
 
-  1. it appears as the right-hand-side of an assignment or initialization of a mutable or member binding; or
+    1. it appears as the right-hand-side of an assignment or initialization of a mutable or member binding; or
 
-  2. it appears as the return value of a function; or
+    2. it appears as the return value of a function; or
 
-  2. it is used as argument to a `sink` parameter.
+    3. it is used as argument to a `sink` parameter.
 
 3. A sinkable binding is escapable at a given program point if it has no use after that program point, and all bindings denoting the same object or sub-objects thereof are escapable at that program point.
 
