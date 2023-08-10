@@ -1,12 +1,12 @@
 # Introduction
 
-Val is a research language based on the principles of mutable value semantics (MVS) (Racordon et al. 2022) for safety and efficiency. It is designed to help developers write and maintain correct programs using powerful abstractions without loss of efficiency.
+Hylo is a language based on the principles of mutable value semantics (MVS) (Racordon et al. 2022) for safety and efficiency. It is designed to help developers write and maintain correct programs using powerful abstractions without loss of efficiency.
 
 # Lexical conventions
 
 ## Program text
 
-1. A Val program is written in text format. The text of a program is written using the [Unicode](https://home.unicode.org) character set and kept in units called source files. A source file is a sequence of Unicode Extended Grapheme clusters.
+1. A Hylo program is written in text format. The text of a program is written using the [Unicode](https://home.unicode.org) character set and kept in units called source files. A source file is a sequence of Unicode Extended Grapheme clusters.
 
 2. This document refers to individual Unicode characters with the notation `U+n` where `n` is a hexadecimal value representing a Unicode code point, and refers to the Unicode general categories to identify groups of Unicode characters.
 
@@ -102,7 +102,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
     The integer literal `0o12_34_5__` is interpreted as the integer `5349` in base 10.
 
-4. The default inferred type of an integer literal is the Val standard library `Int`, which represents a 64-bit signed integer. If the interpreted value of an integer literal is not in the range of representable values for its type, the program is ill-formed.
+4. The default inferred type of an integer literal is the Hylo standard library `Int`, which represents a 64-bit signed integer. If the interpreted value of an integer literal is not in the range of representable values for its type, the program is ill-formed.
 
 #### Floating-point literals
 
@@ -132,7 +132,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 2. The significand of a floating-point literal is the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10, ignoring all occurrences of `_`. If __exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e`.
 
-3. The default inferred type of a floating-point literal is the Val standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
+3. The default inferred type of a floating-point literal is the Hylo standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
 #### Unicode scalar literals
 
@@ -324,9 +324,9 @@ Val is a research language based on the principles of mutable value semantics (M
 
         - if `ls` is not the lexical scope of a module declaration, `ulookup(n, s) = ulookup(n, s')` where `s'` is the innermost scope that contains `s`; or
 
-        - if `s` is the lexical scope of a module declaration other than the Val standard library,  `ulookup(n, s) = ulookup(n, s')` where `s'` is the module declaration of the Val standard library; or
+        - if `s` is the lexical scope of a module declaration other than the Hylo standard library,  `ulookup(n, s) = ulookup(n, s')` where `s'` is the module declaration of the Hylo standard library; or
 
-        - if `s` is the lexical scope of the Val standard library, `ulookup(n, s) = {}`.
+        - if `s` is the lexical scope of the Hylo standard library, `ulookup(n, s) = {}`.
 
 ### Qualified name lookup
 
@@ -393,7 +393,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Memory model
 
-1. The fundamental storage unit in the Val memory model is the *byte*. A byte is a contiguous sequence of 8 bits. The memory available to a Val program consists of one or more sequences of contiguous bytes. Every byte has a unique address.
+1. The fundamental storage unit in the Hylo memory model is the *byte*. A byte is a contiguous sequence of 8 bits. The memory available to a Hylo program consists of one or more sequences of contiguous bytes. Every byte has a unique address.
 
 2. A *memory location* is a contiguous region of storage that has been allocated during a program's execution. A memory location has a size. A non-empty memory location has an address, determined as the address of the first byte in that location.
 
@@ -423,7 +423,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Objects
 
-1. The constructs in a Val program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, `sink` subscript call, `sink` property call, or it is the value of a unique binding. [Note: A function is not an object but a lambda is.]
+1. The constructs in a Hylo program create, destroy, project, access, and modify *objects*. An object is the result of a scalar literal expression, aggregate literal expression, function call, `sink` subscript call, `sink` property call, or it is the value of a unique binding. [Note: A function is not an object but a lambda is.]
 
 2. An object has a type determined at compile-time. That type might be polymorphic; in that case, the implementation generates information associated with the object that makes it possible to determine its concrete dynamic type at runtime.
 
@@ -564,7 +564,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Modules
 
-1. A Val program organizes code into *modules*. A module is a collection of declarations and import statements defined in one or multiple source files. An individual source file has the form:
+1. A Hylo program organizes code into *modules*. A module is a collection of declarations and import statements defined in one or multiple source files. An individual source file has the form:
 
     ```ebnf
     source-file ::=
@@ -598,7 +598,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Program execution
 
-1. Executing a program starts a thread of execution in which the `main` function of its entry module is invoked. [Note: the arguments passed to the program from the environment in which it is run are stored in the global variable `Val.Environment.Arguments`.]
+1. Executing a program starts a thread of execution in which the `main` function of its entry module is invoked. [Note: the arguments passed to the program from the environment in which it is run are stored in the global variable `Hylo.Environment.Arguments`.]
 
 ### Sequential execution
 
@@ -624,7 +624,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## General
 
-1. The Val language is statically typed. Every entity has a type that is known at compile time. The type of an entity is immutable.
+1. The Hylo language is statically typed. Every entity has a type that is known at compile time. The type of an entity is immutable.
 
 2. A type has a canonical form. Two types are equivalent if and only if they have the same canonical form. A type is either *structural* or *nominal*. A nominal type has a name and is defined by a type declaration, unless it is a built-in type. [Note: The types `Any` and `Never` are not considered nominal types.]
 
@@ -636,7 +636,7 @@ Val is a research language based on the principles of mutable value semantics (M
 
 ## Built-in types
 
-1. A built-in type is an instantiable nominal type representing a value on the execution machine. A built-in type may be referred to only in Val standard library and shall not conform to any trait.
+1. A built-in type is an instantiable nominal type representing a value on the execution machine. A built-in type may be referred to only in Hylo standard library and shall not conform to any trait.
 
 2. A built-in type has non-zero size. The value representation of a built-in type determines its *value*.
 
