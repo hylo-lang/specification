@@ -553,7 +553,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
     fun f2() {
       var x = 42
-      let y = y   // immutable projection begins here
+      let y = x   // immutable projection begins here
       print(x)    // OK
       x += 1      // error: 'x' is projected immutably
       print(y)    // immutable projection ends afterward
