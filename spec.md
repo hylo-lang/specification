@@ -642,7 +642,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. A built-in integer types denotes a bit pattern and does not specify signedness. There are six built-in integer types. Five are named `Builtin.I{n}` where `n` is `1`, `8`, `16`, `32`, or `64` and denotes the number of bits in the value representation of the type; the sixth is named `Builtin.Word` and has the same value representation as either `Builtin.I32` or `Builtin.I64` depending on the execution machine. The object representation of a built-in integer type is the minimum number of bytes necessary to store its value representation.
 
-4. There are four built-in floating-point types named `Builtin.F{n}` where `n` is `16`, `32`, `64`, or `80` and denotes the number of bits in the value representation of the type. The object representation of a built-in integer type is the minimum number of bytes necessary to store its value representation.
+4. There are four built-in floating-point types named `Builtin.F{n}` where `n` is `16`, `32`, `64`, or `80` and denotes the number of bits in the value representation of the type. The object representation of a built-in floating-point type is the minimum number of bytes necessary to store its value representation.
 
 5. There is a unique built-in pointer type `Builtin.Pointer` that denotes an untyped pointer to a memory location. The object and value representation of `Builtin.Pointer` are the same as that of `Builtin.Word`.
 
