@@ -196,7 +196,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     let s = """
         Hello,
         World!
@@ -280,7 +280,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 6. (Example)
 
-    ```val
+    ```hylo
     type A {
       fun foo() {}
     }
@@ -293,7 +293,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be conditionally introduced if it is introduced by an extension or conformance declaration that has a where clause; otherwise, it is said to be unconditionally introduced. The same name shall not be unconditionally introduced more than once in a declaration space.
 
-    ```val
+    ```hylo
     type A {
       fun foo() {}
     }
@@ -346,7 +346,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     type A {
       var a: Int
       fun foo(a: Int) { a.copy() }
@@ -509,7 +509,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 5. (Example)
 
-    ```val
+    ```hylo
     type A { property zero: Int { 0 } }
 
     fun main() {
@@ -524,7 +524,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. (Example)
 
-    ```val
+    ```hylo
     subscript min<T: Comparable>(_ a: T, _ b: T): T {
       let { yield if a > b { b } else { a } }
     }
@@ -542,7 +542,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 9. (Example) Mutable and immutable projections:
 
-    ```val
+    ```hylo
     fun f1() {
       var x = 42
       inout y = x // mutable projection begins here
@@ -730,7 +730,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. (Example)
 
-    ```val
+    ```hylo
     type A {
       var x: Int
       public fun foo() -> Int { x.copy() }
@@ -910,7 +910,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     trait Shape {
       static fun name() -> String
       fun draw(to: inout Canvas)
@@ -951,7 +951,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     trait Generator {
       type Element: Copyable
       inout fun next() -> (element: Element, done: Bool)
@@ -970,7 +970,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. (Example)
 
-    ```val
+    ```hylo
     trait State {
       property x: Int { let inout }
     }
@@ -1020,7 +1020,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     trait A: C {} // error: refinement introduces a cycle
     trait B: A {}
     trait C: B {}
@@ -1032,7 +1032,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     trait T { fun foo() }
     trait U { fun bar() }
 
@@ -1064,7 +1064,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 6. (Example)
 
-    ```val
+    ```hylo
     import M
 
     public type A {}
@@ -1178,7 +1178,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. (Example)
 
-    ```val
+    ```hylo
     // In 'MyModule.module.val'
     public namespace Foo {
       public trait T {}
@@ -1206,7 +1206,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     let (name, age): (String, Int) = ("Thomas", 3)
     ```
 
@@ -1258,9 +1258,9 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 6. (Example) Lifetime ending at last use.
 
-    ```val
+    ```hylo
     fun main() {
-      let count = 1 // lifetime of 'count' begins here
+      var count = 1 // lifetime of 'count' begins here
       count += 1    // a use of 'count'
       print(count)  // last use of 'count', lifetime ends afterward
       print("done")
@@ -1269,7 +1269,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. (Example) Lifetime ending because of a consuming operation.
 
-    ```val
+    ```hylo
     fun main() {
       sink let count = 1 // lifetime of 'count' begins here
       sink _ = count     // lifetime of 'count' ends here
@@ -1281,9 +1281,9 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 9. (Example) A binding with two lifetimes.
 
-    ```val
+    ```hylo
     fun borrow<A>(_ thing: inout T) {
-      let a = [thing]         // lifetime of 'thing' ends here
+      var a = [thing]         // lifetime of 'thing' ends here
       print(a)
       thing = a.remove_last() // new lifetime of 'thing' starts here.
     }
@@ -1329,7 +1329,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     fun gcd(_ a: Int, _ b: Int) -> Int {
       if b == 0 { a } else { gcd(b, a % b) }
     }
@@ -1400,7 +1400,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 6. (Example) Expression-bodied function
 
-    ```val
+    ```hylo
     fun factorial(_ n: Int) -> Int {
       if n > 0 { n * factorial(n - 1) } else { 1 }
     }
@@ -1416,7 +1416,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. The declaration of a method `m` that contains an explicit `inout` method implementation is automatically provided with a synthesized `sink` method implementation, defined as follows:
 
-    ```val no-parse
+    ```hylo no-parse
     sink {
       sink var this = self
       &this.m(arg1, ..., argn)
@@ -1426,7 +1426,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 5. The declaration of a method `m` that contains an explicit `sink` method implementation is automatically provided with a synthesized `inout` method implementation, defined as follows:
 
-    ```val no-parse
+    ```hylo no-parse
     inout {
       self = m(arg1, ..., argn)
     }
@@ -1434,7 +1434,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 6. (Example)
 
-    ```val
+    ```hylo
     type Vector2 {
 
       var x: Double
@@ -1500,7 +1500,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     subscript min<T, E>(_ a: T, _ b: T, by comparator: [E](T, T) -> Bool): Int {
       let   { yield if comparator(a, b) { a } else { b } }
       inout { yield &(if comparator(a, b) { a } else { b }) }
@@ -1513,7 +1513,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
     1. A subscript declaration at module scope or namespace scope introduces a global subscript declaration. It introduces a global subscript.
 
-    2. A subscript declaration at type scope that contains a `static` modifier is called a static subscript declaration; it is also a global subscript declaration. A static member subscript declaration introduces a global susbcript.
+    2. A subscript declaration at type scope that contains a `static` modifier is called a static subscript declaration; it is also a global subscript declaration. A static member subscript declaration introduces a global subscript.
 
     3. A subscript declaration at type scope that does not contain a `static` modifier is called a member subscript declaration. It introduces a member subscript. A member subscript declaration may not have a receiver modifier.
 
@@ -1527,7 +1527,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. A subscript declaration may contain at most one subscript implementation of each kind.
 
-9.  A capture list may only appear in a subscript declaration at local scope.
+9. A capture list may only appear in a subscript declaration at local scope.
 
 ### Subscript signatures
 
@@ -1544,7 +1544,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. (Example)
 
-    ```val
+    ```hylo
     extension Array where Element: Copyable {
 
       subscript generator(from start: Int): var [some _] () inout -> Maybe<Element> {
@@ -1748,7 +1748,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 3. (Example)
 
-    ```val
+    ```hylo
     fun main() {
       var counter = 0
       do {
@@ -1758,7 +1758,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     }
     ```
 
-    The binding `x` that occurrs in the condition of the `do-while` statement is declared in it its body.
+    The binding `x` that occurs in the condition of the `do-while` statement is declared in its body.
 
 4. The head of a `do-while` statement unconditionally transfers control to the body of the loop. The tail performs a continuation test. If it succeeds, control is transferred back to the head. Otherwise, control exits the loop.
 
@@ -1802,7 +1802,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     fun main() {
       var things: Array<Any> = [1, "abc", 3, 2]
       for inout x: Int in things where x < 3 {
@@ -1816,7 +1816,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 4. (Example)
 
-    ```val
+    ```hylo
     fun main() {
       for let x in 0 ..< x { print(x) }
     }
@@ -1830,7 +1830,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7.  (Example)
 
-    ```val
+    ```hylo
     fun main() {
       var things: Array<Any> = [1, "abc", 3, 2]
       for inout x: Int in things where x < 3 {
@@ -1840,9 +1840,9 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     }
     ```
 
-    This program can be understood as though it had be written:
+    This program can be understood as though it had been written as:
 
-    ```val
+    ```hylo
     fun main() {
       var things: Array<Any> = [1, "abc", 3, 2]
       var iterator = things.make_iterator()
@@ -1902,7 +1902,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. (Example)
 
-    ```val
+    ```hylo
     subscript element<A>(at index: Int, in array: Array<A>): T {
       print("will yield")
       yield array[position]
@@ -1970,7 +1970,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 ### Consuming expressions
 
-1. A value expression is consuming if and only if its evaluation may end the lifetime of one or objects not created by the expression's evaluation.
+1. A value expression is consuming if and only if its evaluation may end the lifetime of one or more objects not created by the expression's evaluation.
 
 ## Infix expressions
 
@@ -2130,12 +2130,12 @@ An async expression defined in a scope shall either escape that scope or be cons
 
 3. (Example)
 
-    ```val
+    ```hylo
     let a = []               // error: cannot infer empty buffer type without context
     let b = [1, 2]           // OK, 'b' has type 'Int[2]'
     let c = [1, 2.0]         // error: '2.0' does not have type 'Int'
     let d: Double[] = [1, 2] // OK, 'd' has type 'Double[2]'
-    let e: Int[] = []        // warning: zero-lenght buffer
+    let e: Int[] = []        // warning: zero-length buffer
     ```
 
 #### Map literal
@@ -2160,7 +2160,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
 4. (Example)
 
-    ```val
+    ```hylo
     let a = [:]                // error: cannot infer empty map type without context
     let b = [1: "a", 2: "b"]   // OK, 'b' has type 'Map<Int, String>'
     let c = [1: "a", 2.0: "b"] // error: '2.0' does not have type 'Int'
@@ -2224,7 +2224,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
 4. (Example)
 
-    ```val
+    ```hylo
     type A {
       let m: Int
       static let n = 0
@@ -2232,7 +2232,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
     let foo = A(m: 0)
     let i = foo.m   // OK
-    let j = A.m     // OK
+    let j = A.m     // error
     let k = foo.n   // error
     let l = A.n     // OK
     ```
@@ -2241,7 +2241,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
 6. (Example)
 
-    ```val
+    ```hylo
     type Vector2 {
       var x: Double
       var y: Double
@@ -2457,7 +2457,7 @@ An async expression defined in a scope shall either escape that scope or be cons
 
 2. A cast expression results in an object or projection whose type is the type denoted by the right operand of the expression.
 
-3. A cast expression whose left operand is escapable may be used
+3. A cast expression whose left operand is escapable may be used.
 
 4. An upcast expression is well-formed if the type of the left operand is statically known to be subtype of the type denoted by the right operand. The result of an upcast expression `e` is an immutable projection of the left operand, unless `e` is the operand of a consuming operation and its left operand is sinkable. In that case, the value of the left operand escapes.
 
