@@ -1285,7 +1285,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     fun borrow<A>(_ thing: inout T) {
       var a = [thing]         // lifetime of 'thing' ends here
       print(a)
-      thing = a.remove_last() // new lifetime of 'thing' starts here.
+      &thing = a.remove_last() // new lifetime of 'thing' starts here.
     }
     ```
 
