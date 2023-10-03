@@ -1261,7 +1261,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     ```hylo
     fun main() {
       var count = 1 // lifetime of 'count' begins here
-      count += 1    // a use of 'count'
+      &count += 1   // a use of 'count'
       print(count)  // last use of 'count', lifetime ends afterward
       print("done")
     }
