@@ -1678,6 +1678,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       loop-stmt
       jump-stmt
       decl-stmt
+      conditional-compilation-stmt
       expr
     ```
 
@@ -1944,6 +1945,85 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       subscript-decl
       binding-decl
     ```
+
+## Conditional compilation block
+
+1. Conditional compilation blocks have the form:
+
+    ```ebnf
+    conditional-compilation-stmt ::=
+      '#if' compiler-condition stmt-list conditional-compilation-tail? `#endif`
+
+    conditional-compilation-tail ::=
+      `#else` stmt-list
+      `#elseif` compiler-condition stmt-list conditional-compilation-tail?
+
+    compiler-condition ::=
+      'true'
+      'false'
+      'os' '(' identifier ')'
+      'arch' '(' identifier ')'
+      'compiler' '(' identifier ')'
+      'compilerversion' '(' version-condition ')'
+      'hyloversion' '(' version-condition ')'
+
+    version-condition ::=
+      '>=' version-number
+      '<' version-number
+
+    version-number ::=
+      integer-literal version-number-tail?
+
+    version-number-tail ::=
+      '.' integer-literal version-number-tail?
+    ```
+
+2. (Example)
+
+    ```hylo
+    #if os(MacOS)
+      // code that will only run when compiling for macOS
+    #elseif os(Linux)
+      // code that will only run when compiling for Linux
+    #elseif os(Windows)
+      // code that will only run when compiling for Windows
+    #endif
+    ```
+
+3. A code like
+
+  ```hylo
+  #if <c1>
+    <statements1>
+  #elseif <c2>
+    <code2>
+  #endif
+  ```
+  is equivalent with
+  ```hylo
+  #if <c1>
+    <statements1>
+  #else
+  #if <c2>
+    <code2>
+  #endif
+  #endif
+  ```
+  (where `<code2>` can contain zero or more `#elseif` occurrences)
+
+4. The conditions are evaluated at compile time. The statements within a conditional compilation block are compiled and executed only if the condition evaluates to `true` at compile time.
+
+5. Unless the condition is `compiler`, `compilerversion` or `hyloversion`, the body of the conditional compilation block is parsed; for the above conditions we don't parse the body, to ensure we have a way of coping with multiple syntaxes introduced by different versions of the compiler/language.
+
+6. The compiler defines a value to represent the target operating system. Compiler condition `os(<X>)` evaluates to `true` only if `<X>` matches the value defined by the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `MacOS`, `Linux`, `Windows`.
+
+7. The compiler defines a value to represent the target architecture for the compilation. Compiler condition `arch(<X>)` evaluates to `true` only if `<X>` matches the value defined by the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `x86_64`, `i386`, `arm`, `arm64`.
+
+8. Compiler condition `compiler(<X>)` evaluates to `true` only if `<X>` matches the name of the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `hc`.
+
+9. The identifiers that are passed to `os`, `arch` and `compiler` conditions don't need to belong to a fixed set. Expressions like `os(abracadabra)`, `arch(school)` are value and (probably) evaluate to `false`. 
+
+10. For `compilerversion` and `hyloversion` conditions, the compiler will define a value of the form _A.B.C..._ (with one or more parts). Depending on the version condition operation this is compared to what the version the user provided, and based on that, the compiler condition evaluates to `true` and `false`. Example: condition `hyloversion(<1.0)` evaluates to `true` if the compiler targets a version of the language that is prior to version 1.0.
 
 # Value expressions
 
