@@ -1963,9 +1963,13 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       'false'
       'os' '(' identifier ')'
       'arch' '(' identifier ')'
+      'feature' '(' identifier ')'
       'compiler' '(' identifier ')'
       'compilerversion' '(' version-condition ')'
       'hyloversion' '(' version-condition ')'
+      '!' compiler-condition
+      compiler-condition '&&' compiler-condition
+      compiler-condition '||' compiler-condition
 
     version-condition ::=
       '>=' version-number
@@ -2019,11 +2023,15 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. The compiler defines a value to represent the target architecture for the compilation. Compiler condition `arch(<X>)` evaluates to `true` only if `<X>` matches the value defined by the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `x86_64`, `i386`, `arm`, `arm64`.
 
-8. Compiler condition `compiler(<X>)` evaluates to `true` only if `<X>` matches the name of the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `hc`.
+8. Condition `feature(<X>)` evaluates to `true` only if `<X>` is a feature active in the current compilation. Example of such feature: `useLibC` (which is enabled when libc is used in the standard library).
 
-9. The identifiers that are passed to `os`, `arch` and `compiler` conditions don't need to belong to a fixed set. Expressions like `os(abracadabra)`, `arch(school)` are value and (probably) evaluate to `false`. 
+9. Compiler condition `compiler(<X>)` evaluates to `true` only if `<X>` matches the name of the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `hc`.
 
-10. For `compilerversion` and `hyloversion` conditions, the compiler will define a value of the form _A.B.C..._ (with one or more parts). Depending on the version condition operation this is compared to what the version the user provided, and based on that, the compiler condition evaluates to `true` and `false`. Example: condition `hyloversion(<1.0)` evaluates to `true` if the compiler targets a version of the language that is prior to version 1.0.
+10. The identifiers that are passed to `os`, `arch` and `compiler` conditions don't need to belong to a fixed set. Expressions like `os(abracadabra)`, `arch(school)` are value and (probably) evaluate to `false`. 
+
+11. For `compilerversion` and `hyloversion` conditions, the compiler will define a value of the form _A.B.C..._ (with one or more parts). Depending on the version condition operation this is compared to what the version the user provided, and based on that, the compiler condition evaluates to `true` and `false`. Example: condition `hyloversion(<1.0)` evaluates to `true` if the compiler targets a version of the language that is prior to version 1.0.
+
+12. Operators `!`, `&&` and `||` used in conditional compilation statements have the same meaning as the operators with the same name used for boolean expressions.
 
 # Value expressions
 
