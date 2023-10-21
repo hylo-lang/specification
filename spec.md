@@ -1968,8 +1968,6 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       'compilerversion' '(' version-condition ')'
       'hyloversion' '(' version-condition ')'
       '!' compiler-condition
-      compiler-condition '&&' compiler-condition
-      compiler-condition '||' compiler-condition
 
     version-condition ::=
       '>=' version-number
@@ -2031,7 +2029,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 11. For `compilerversion` and `hyloversion` conditions, the compiler will define a value of the form _A.B.C..._ (with one or more parts). Depending on the version condition operation this is compared to what the version the user provided, and based on that, the compiler condition evaluates to `true` and `false`. Example: condition `hyloversion(<1.0)` evaluates to `true` if the compiler targets a version of the language that is prior to version 1.0.
 
-12. Operators `!`, `&&` and `||` used in conditional compilation statements have the same meaning as the operators with the same name used for boolean expressions.
+12. Operator `!` negates the logical value of the given condition.
 
 # Value expressions
 
