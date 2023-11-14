@@ -2021,7 +2021,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 7. The compiler defines a value to represent the target architecture for the compilation. Compiler condition `arch(<X>)` evaluates to `true` only if `<X>` matches the value defined by the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `x86_64`, `i386`, `arm`, `arm64`.
 
-8. Condition `feature(<X>)` evaluates to `true` only if `<X>` is a feature active in the current compilation. Example of such feature: `useLibC` (which is enabled when libc is used in the standard library).
+8. Condition `feature(<X>)` evaluates to `true` only if `<X>` is a feature active in the current compilation. Example of such feature: `freestanding` (which is enabled when the standard library is not based on OS features and doesn't link to libc).
 
 9. Compiler condition `compiler(<X>)` evaluates to `true` only if `<X>` matches the name of the compiler; otherwise it evaluates to `false`. Examples of common values defined in the compiler: `hc`.
 
