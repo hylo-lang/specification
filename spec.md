@@ -132,7 +132,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 2. The significand of a floating-point literal is the __decimal-fractional-constant__ or the __decimal-literal__ preceding the __exponent__. In the significand, the digits and optional period are interpreted as a base `N` real number `s`, where `N` is 10, ignoring all occurrences of `_`. If __exponent__ is present, the exponent `e` of the floating-point-literal is the result of interpreting the sequence of an optional `sign` and the digits as a base 10 integer. Otherwise, the exponent `e` is 0. The scaled value of the literal is `s × 10e`.
 
-3. The default inferred type of a floating-point literal is the Hylo standard library `Double`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
+3. The default inferred type of a floating-point literal is the Hylo standard library `Float64`, which represents a 64-bit floating point number. If the interpreted value of a floating-point literal is not in the range of representable values for its type, the program is ill-formed. Otherwise, the value of a floating-point literal is the interpreted value if representable, else the larger or smaller representable value nearest the interpreted value, chosen in an implementation-defined manner.
 
 #### Unicode scalar literals
 
@@ -1437,15 +1437,15 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     ```hylo
     type Vector2 {
 
-      var x: Double
-      var y: Double
+      var x: Float64
+      var y: Float64
 
-      fun scaled(by factor: Double) -> Self {
+      fun scaled(by factor: Float64) -> Self {
         let   { Vector2(x: x * factor, y: y * factor) }
         inout { x *= factor; y *= factor }
       }
 
-      fun dot(_ other: Vector2) -> Double {
+      fun dot(_ other: Vector2) -> Float64 {
         x * other.x + y * other.y
       }
 
@@ -2134,7 +2134,7 @@ An async expression defined in a scope shall either escape that scope or be cons
     let a = []               // error: cannot infer empty buffer type without context
     let b = [1, 2]           // OK, 'b' has type 'Int[2]'
     let c = [1, 2.0]         // error: '2.0' does not have type 'Int'
-    let d: Double[] = [1, 2] // OK, 'd' has type 'Double[2]'
+    let d: Float64[] = [1, 2] // OK, 'd' has type 'Float64[2]'
     let e: Int[] = []        // warning: zero-length buffer
     ```
 
@@ -2164,8 +2164,8 @@ An async expression defined in a scope shall either escape that scope or be cons
     let a = [:]                // error: cannot infer empty map type without context
     let b = [1: "a", 2: "b"]   // OK, 'b' has type 'Map<Int, String>'
     let c = [1: "a", 2.0: "b"] // error: '2.0' does not have type 'Int'
-    let d: Map<Double, String> = [1: "a", 2.0: "b"] // OK
-    let e: Map<Double, String> = [:] // OK
+    let d: Map<Float64, String> = [1: "a", 2.0: "b"] // OK
+    let e: Map<Float64, String> = [:] // OK
     ```
 
 ### Primary declaration references
@@ -2243,10 +2243,10 @@ An async expression defined in a scope shall either escape that scope or be cons
 
     ```hylo
     type Vector2 {
-      var x: Double
-      var y: Double
+      var x: Float64
+      var y: Float64
 
-      fun scaled(by factor: Double) -> Self {
+      fun scaled(by factor: Float64) -> Self {
         let   { Vector2(x: x * factor, y: y * factor) }
         inout { x *= factor; y *= factor }
       }
