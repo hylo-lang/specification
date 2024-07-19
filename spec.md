@@ -2608,7 +2608,7 @@ sink e  = a as sink Int
 
     ```ebnf
     tuple-type-expr ::=
-      '{' tuple-type-element-list '}'
+      '{' tuple-type-element-list? '}'
 
     tuple-type-element-list ::=
       tuple-type-element (',' tuple-type-element)?
