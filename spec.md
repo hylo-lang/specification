@@ -1467,7 +1467,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       method-introducer brace-stmt?
 
     method-introducer ::= (one of)
-      let sink inout
+      let sink inout set
     ```
 
 2. An explicit method implementation introduced with `let` is called a `let` method implementation; one introduced with `sink` is called a `sink` method implementation; one introduced with `inout` is called an `inout` method implementation.
