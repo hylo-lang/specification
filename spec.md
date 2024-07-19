@@ -1303,7 +1303,7 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
       function-head function-signature function-body?
 
     memberwise-init-decl ::=
-      'memberwise' 'init'
+      access-modifier? 'memberwise' 'init'
 
     deinit-decl ::=
       'deinit' brace-stmt
