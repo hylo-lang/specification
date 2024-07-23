@@ -256,21 +256,21 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 ## Preamble
 
-1. An *entity* is an object, projection, function, subscript, property, trait, type, namespace, or module.
+1. An *entity* is a function, subscript, property, trait, type, namespace, or module.
 
-2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method or subscript implementation introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name shall not have argument labels. A name, function name, or operator name that contains a method or subscript implementation introducer is called a *method name*. Every name is introduced by a declaration unless it is a reserved keyword bound to a built-in entity.
+2. A *name* denotes an entity. A name is composed of a stem identifier, and, optionally argument labels and/or an operator notation and/or a method or subscript implementation(variant) introducer. A name that is only composed of a stem identifier is called a *bare name*. A name that contains labels is called a *function name*. A name that contains an operator notation is called an *operator name*. An operator name shall not have argument labels. A name, function name, or operator name that contains a method or subscript implementation introducer is called a *method name*. Every name is introduced by a declaration unless it is a reserved keyword bound to a built-in entity.
 
-3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let`. are method names.
+3. (Example) `foo` and `+` are bare names. `foo(bar:ham:)` is a function name. `infix+` is an operator name. `foo.let` and `foo(bar:ham:).let` are method names.
 
-4. An __identifier-expr__ is said to be a *use* of the name that it denotes. An expression is said to be a use of all the uses of its sub-expressions.
+4. An __identifier-expr__ is said to be(?) a *use* of the name that it denotes. An expression containing an __identifier-expr__ is said to be a use of that __identifier-expr__.
 
-5. A *binding* is a name that denotes an object or projection. The value of a binding is the object denoted by that binding or the value of the projection denoted by that binding. A binding shall be mutable or immutable. A mutable binding shall be used to modify its value; an immutable binding shall not. A binding is *dead* at a given program point if it denotes an object that has escaped, or if there are no uses of it at that program point and any other program point reachable from there. A mutable binding may be *resurrected* by reassigning it to an object; an immutable binding may not.
+5. [binding, storage, objects all have lifetime and are the core elements of the object model; define live, dead, ressurrected in terms of the state of these] A *binding* is a name that denotes a projection. A binding shall be mutable or immutable. A mutable binding may be used to modify its value; an immutable binding may not. A binding is *dead* at a given program point if it denotes an object that has escaped, or if there are no uses of it at that program point and any other program point reachable from there. A mutable binding may be *resurrected* by reassigning it to an object; an immutable binding may not.
 
 ## Scopes and declaration spaces
 
 1. A *lexical scope* is a region of the program text represented by a syntactic element.
 
-2. The lexical scope of a module or namespace declaration is called a *global scope*. The lexical scope of a type, extension, trait, or conformance declaration is called a *type scope*. Unless specified otherwise, the lexical scope of any other syntactic element is called a *local scope*.
+2. The lexical scope of a module or namespace declaration is called a *global scope*. The lexical scope of a type, extension, trait, or conformance declaration is called a *type scope*. The lexical scope of any other syntactic element is called a *local scope*.
 
 3. A lexical scope `l1` *contains* a lexical scope `l2` if the region of the program text covered by `l1` includes that covered by `l2`. The innermost lexical scope that contains a lexical scope `l1` and that is not `l1` is called the *parent* of `l1`.
 
@@ -289,9 +289,9 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     }
     ```
 
-    The declarations space of the type declaration includes `foo` and `bar`.
+    The declaration space of `A` includes `foo` and `bar`.
 
-7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be conditionally introduced if it is introduced by an extension or conformance declaration that has a where clause; otherwise, it is said to be unconditionally introduced. The same name shall not be unconditionally introduced more than once in a declaration space.
+7. A declaration may introduce one or more names in the declaration space of the innermost lexical scope that contains it. A name is said to be *conditionally introduced* if it is introduced by an extension or conformance declaration that has a `where` clause; otherwise, it is said to be *unconditionally introduced*. The program is ill-formed if the same name is unconditionally introduced more than once in a declaration space.
 
     ```hylo
     type A {
@@ -380,8 +380,9 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
     - If `s` is the lexical scope of an extension or conformance declaration, `qslookup(n, s) = qslookup(n, s')` where `s'` is the lexical scope of the declaration of the extended type.
 
 ## Program and linkage
+[Research C++ Modules spec; check this section]
 
-1. A program consists of one or more module declarations linked together.
+1. A program consists of one or more moduleslinked together.
 
 2. A name is said to have linkage when it may denote the same entity as a name introduced by a declaration in another scope.
 
@@ -407,6 +408,8 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
 ### Memory location lifetime
 
+(Storage)
+
 1. The lifetime of a memory location starts when it is allocated and ends when it is deallocated. The lifetime of a memory location falls in one of three categories: *static*, *automatic*, or *dynamic*. The lifetime category is determined by the construct used to allocate the memory location.
 
     1. A memory location allocated for an object declared by a global binding declaration has *static lifetime* and is called a *static memory location*.
@@ -415,11 +418,13 @@ Hylo is a language based on the principles of mutable value semantics (MVS) (Rac
 
     3. A memory location allocated by a call to `Builtin.aligned_alloc(alignment:byte_count:)` has *dynamic lifetime* and is called a *dynamic memory location*.
 
+[shuffle all statements about builtins to an appendix]
+
 2. A program shall terminate the lifetime of a dynamic memory location by calling `Builtin.dealloc`. Behavior is undefined if a program calls `Builtin.dealloc` to deallocate a static or automatic memory location.
 
-3. A memory location shall not be occupied by an initializing, alive, or deinitializing object when it reaches the end of its lifetime.
+3. A memory location shall not be occupied by an initializing, alive, or deinitializing object when the location reaches the end of its lifetime.
 
-4. When the end of the lifetime a memory location is reached, all names denoting objects stored within that location become invalid. Deallocating a memory location that has already reached the end of its lifetime has undefined behavior.
+4. Deallocating a memory location that has already reached the end of its lifetime has undefined behavior. [double-delete]
 
 ## Objects
 
